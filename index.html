@@ -1,0 +1,645 @@
+<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1424"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SOUL"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><link rel="icon" href="icons/icon-192.png"><title>SOUL — Your Peaceful Place</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Nunito:wght@300;400;600&display=swap">
+<style>
+/* Layout: one phone-width column, full-bleed cinematic background, frosted cards, bottom navigation. Single committed dark look. */
+:root{
+  --sage:#a8bfa8; --sky:#a7c7e7; --lav:#c8b6e2; --cream:#f8f3ea; --gold:#e8c98b;
+  --night:#0e1424; --ink:#2b3a35;
+  --glass:rgba(248,243,234,.14); --glass-b:rgba(248,243,234,.28);
+  --glassd:rgba(14,20,36,.45); --glassd-b:rgba(248,243,234,.16);
+  --display:'Cormorant Garamond',Georgia,serif; --body:'Nunito',system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--cream);font:400 15px/1.5 var(--body);
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+#app{position:relative;height:100%;max-width:430px;margin:0 auto;overflow:hidden;overflow:clip;background:var(--night)}
+@media(min-width:520px){#app{border-left:1px solid var(--glassd-b);border-right:1px solid var(--glassd-b)}}
+#bg{position:absolute;inset:0;z-index:0}
+.layer{position:absolute;inset:0;opacity:0;transition:opacity 2.2s ease-in-out}
+.layer.on{opacity:1}
+.layer .grad{position:absolute;inset:-8%;animation:drift 40s ease-in-out infinite}
+#bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent 40%,rgba(0,0,0,.38));pointer-events:none}
+#screen{position:absolute;inset:0;z-index:2;overflow-y:auto;padding:max(14px,env(safe-area-inset-top,0px)) 20px 168px;scrollbar-width:none}
+#screen::-webkit-scrollbar{display:none}
+.view{animation:fadein .7s ease both;min-height:100%}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes drift{0%,100%{transform:translate3d(-4%,0,0) scale(1.08)}50%{transform:translate3d(4%,-2%,0) scale(1.14)}}
+@keyframes glow{0%,100%{opacity:.55;transform:translateX(-50%) scale(1)}50%{opacity:.9;transform:translateX(-50%) scale(1.08)}}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes rainfall{from{transform:translateY(-20vh)}to{transform:translateY(120vh)}}
+@keyframes sway{0%,100%{transform:rotate(-6deg);opacity:.35}50%{transform:rotate(6deg);opacity:.6}}
+@keyframes mist{from{transform:translateX(-12%)}to{transform:translateX(12%)}}
+@keyframes wave{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.fx-glow{position:absolute;left:50%;top:34%;width:70vmin;height:70vmin;max-width:300px;max-height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(248,243,234,.75),rgba(232,201,139,.35) 35%,transparent 70%);animation:glow 9s ease-in-out infinite}
+.fx-ray{position:absolute;top:-40px;height:120%;width:18%;filter:blur(18px);background:linear-gradient(180deg,rgba(248,243,234,.55),transparent);transform-origin:50% -10%;animation:sway 14s ease-in-out infinite}
+.fx-mist{position:absolute;left:-20%;width:140%;border-radius:50%;background:rgba(248,243,234,.18);filter:blur(40px);animation:mist 30s ease-in-out infinite alternate}
+.fx-wave{position:absolute;left:0;bottom:0;width:100%;height:22%;overflow:hidden;opacity:.7}
+.fx-wave svg{width:200%;height:100%;animation:wave 22s linear infinite;display:block}
+.fx-star{position:absolute;border-radius:50%;background:var(--cream);animation:twinkle 4s ease-in-out infinite}
+.fx-drop{position:absolute;top:0;width:1px;background:linear-gradient(180deg,transparent,rgba(248,243,234,.4),transparent);animation:rainfall linear infinite}
+.still .layer .grad,.still .fx-glow,.still .fx-ray,.still .fx-mist,.still .fx-wave svg,.still .fx-star,.still .fx-drop{animation:none!important}
+@media(prefers-reduced-motion:reduce){.layer .grad,.fx-glow,.fx-ray,.fx-mist,.fx-wave svg,.fx-star,.fx-drop{animation:none!important}}
+
+.glass{background:var(--glass);border:1px solid var(--glass-b);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.glassd{background:var(--glassd);border:1px solid var(--glassd-b);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.soft{text-shadow:0 2px 24px rgba(20,30,40,.4)}
+h1,h2,.disp{font-family:var(--display);font-weight:500;margin:0}
+.center{text-align:center}
+.eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:rgba(248,243,234,.72)}
+.muted{color:rgba(248,243,234,.68);font-size:12.5px}
+.btn{display:inline-block;border-radius:999px;background:rgba(248,243,234,.92);color:var(--ink);font-weight:600;letter-spacing:.2em;font-size:13px;padding:16px 30px;box-shadow:0 10px 40px rgba(232,201,139,.35);transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn.sm{padding:12px 22px;letter-spacing:.08em}
+.ib{width:44px;height:44px;border-radius:50%;display:inline-grid;place-items:center;color:rgba(248,243,234,.9);transition:transform .15s,background .2s}
+.ib:active{transform:scale(.9)}
+.ib.act{background:rgba(232,201,139,.4)}
+.ib:disabled{opacity:.35}
+.ib svg,.ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ib svg.f,.ico svg.f{fill:currentColor;stroke:none}
+.card{border-radius:24px;padding:20px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none;margin:0 -20px;padding-left:20px;padding-right:20px}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;border-radius:999px;padding:9px 16px;font-size:14px;background:var(--glass);border:1px solid var(--glass-b)}
+.chip.on{background:rgba(248,243,234,.92);color:var(--ink);font-weight:600}
+
+nav{position:absolute;z-index:5;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:8px 8px max(8px,env(safe-area-inset-bottom,0px));border-radius:24px 24px 0 0}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;padding:6px 8px;border-radius:16px;font-size:11px;letter-spacing:.03em;color:rgba(248,243,234,.75)}
+nav button.on{color:var(--gold)}
+nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#mini{position:absolute;z-index:4;left:12px;right:12px;bottom:calc(74px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:2px;border-radius:999px;padding:3px 4px 3px 16px}
+#mini.show{display:flex}
+#mini .t{flex:1;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+
+.mood{display:block;width:100%;text-align:left;border-radius:18px;padding:16px 22px;font-size:18px;margin-bottom:12px;transition:transform .15s}
+.mood:active{transform:scale(.98)}
+.row{display:flex;align-items:center;gap:8px}
+.track{border-radius:18px;padding:6px 8px 6px 6px;margin-bottom:8px}
+.track.on{box-shadow:0 0 0 1px rgba(232,201,139,.6)}
+.track .n{flex:1;min-width:0}
+.bar{height:6px;border-radius:99px;background:rgba(248,243,234,.25);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .5s linear}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:rgba(248,243,234,.35)}
+input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:rgba(248,243,234,.35)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-8px;border-radius:50%;background:var(--cream);box-shadow:0 0 0 5px rgba(232,201,139,.35)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border:0;border-radius:50%;background:var(--cream);box-shadow:0 0 0 5px rgba(232,201,139,.35)}
+.sl{display:block;padding:6px 0}.sl>div{display:flex;justify-content:space-between;font-size:14px;font-weight:600}.sl>div span+span{font-weight:400;color:rgba(248,243,234,.7)}
+.sw{position:relative;width:54px;height:32px;border-radius:99px;background:rgba(248,243,234,.25);flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;left:4px;top:4px;width:24px;height:24px;border-radius:50%;background:var(--cream);transition:transform .25s}
+.sw[aria-checked=true]{background:var(--sage)}.sw[aria-checked=true]::after{transform:translateX(22px)}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:10px 0}
+select{width:100%;margin-top:8px;border-radius:12px;border:1px solid var(--glass-b);background:rgba(14,20,36,.6);color:var(--cream);padding:12px;font:inherit}
+.sphere{width:230px;height:230px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F8F3EA 0%,#E8C98B 40%,rgba(200,182,226,.75) 75%,rgba(167,199,231,.3) 100%);box-shadow:0 0 90px 24px rgba(232,201,139,.35);transform:scale(.85);opacity:.85}
+.quote{border-radius:18px;padding:16px;margin-bottom:12px}
+.quote p{font-family:var(--display);font-size:21px;line-height:1.25;margin:4px 0 6px}
+.toast{position:absolute;z-index:9;left:50%;bottom:150px;transform:translateX(-50%);border-radius:99px;padding:12px 20px;font-size:14px;max-width:86%;text-align:center}
+.note{background:rgba(232,201,139,.16);border:1px solid rgba(232,201,139,.5);border-radius:14px;padding:10px 14px;font-size:12.5px;margin:0 0 16px}
+</style></head><body>
+
+<div id="app" class="">
+  <div id="bg" aria-hidden="true"></div>
+  <main id="screen"></main>
+  <div id="mini" class="glassd"></div>
+  <nav id="nav" class="glassd" aria-label="Navigare principală"></nav>
+</div>
+
+<script>
+const D = {"QUOTES":[{"id":"hope-1","category":"hope","text":"Nu știi încă cum se va așeza totul, și e în regulă. Ziua de mâine nu are nevoie de tine perfect pregătit."},{"id":"hope-2","category":"hope","text":"Unele răspunsuri vin abia după ce ai trăit îndeajuns de mult cu întrebarea."},{"id":"hope-3","category":"hope","text":"Greutatea de azi nu spune nimic despre tot ce urmează. Doar descrie o zi."},{"id":"hope-4","category":"hope","text":"Există lucruri bune care încă nu ți s-au întâmplat. Nu trebuie să le vezi ca să existe."},{"id":"hope-5","category":"hope","text":"Chiar și după o noapte lungă, lumina vine fără să ceară nimic în schimb."},{"id":"hope-6","category":"hope","text":"Nu trebuie să crezi acum că va fi bine. Ajunge să lași ușa deschisă pentru posibilitatea asta."},{"id":"hope-7","category":"hope","text":"Rănile se închid în ritmul lor. Nu e o competiție și nu ești în urmă."},{"id":"hope-8","category":"hope","text":"Cât timp te mai întrebi ce urmează, înseamnă că ceva din tine mai are curiozitate. Păstrează-o."},{"id":"hope-9","category":"hope","text":"Uneori speranța e doar un lucru mic: o cană caldă, un cer limpede, un om care răspunde la telefon."},{"id":"hope-10","category":"hope","text":"Nu toate schimbările sunt zgomotoase. Cele mai multe încep în liniște, undeva în interior."},{"id":"hope-11","category":"hope","text":"Ai trecut deja prin zile pe care nu credeai că le poți duce. Asta contează, chiar dacă nu pare."},{"id":"hope-12","category":"hope","text":"Poți să porți îndoiala și să faci totuși un pas mic. Cele două nu se exclud."},{"id":"hope-13","category":"hope","text":"Ce simți acum este real, dar nu este definitiv."},{"id":"courage-1","category":"courage","text":"Curajul nu înseamnă lipsa fricii. Înseamnă să te muți un centimetru înainte cu ea alături."},{"id":"courage-2","category":"courage","text":"Poți face lucrul acela mic care îți e greu. Nu pe tot, doar prima parte."},{"id":"courage-3","category":"courage","text":"Să ceri ajutor este o formă de putere pe care mulți o descoperă târziu."},{"id":"courage-4","category":"courage","text":"Nu trebuie să fii calm ca să faci ceva important. Poți tremura și să mergi."},{"id":"courage-5","category":"courage","text":"Spune adevărul tău în cuvinte simple. Nu trebuie să sune frumos ca să fie valabil."},{"id":"courage-6","category":"courage","text":"Fiecare dată când rămâi cu tine în loc să fugi, înveți ceva despre cât poți duce."},{"id":"courage-7","category":"courage","text":"A încerca și a nu reuși încă este mai aproape de viață decât a rămâne la margine din teamă."},{"id":"courage-8","category":"courage","text":"Nu trebuie să fii sigur. Trebuie doar să fii dispus să faci următorul gest cinstit."},{"id":"courage-9","category":"courage","text":"Frica îți arată adesea ce contează pentru tine. Merită ascultată, nu neapărat urmată."},{"id":"courage-10","category":"courage","text":"Un refuz spus cu blândețe poate fi un act de curaj."},{"id":"courage-11","category":"courage","text":"Ai voie să începi neîndemânatic. Nimeni nu a început altfel."},{"id":"courage-12","category":"courage","text":"Dacă azi ai reușit doar să te ridici din pat, ai făcut un lucru real."},{"id":"courage-13","category":"courage","text":"Nu ești obligat să fii puternic tot timpul. Poți fi pur și simplu prezent."},{"id":"acceptance-1","category":"acceptance","text":"Nu trebuie să îți placă ce simți ca să ai voie să simți."},{"id":"acceptance-2","category":"acceptance","text":"Unele lucruri nu se rezolvă, se poartă. Și se poartă mai ușor când nu te lupți și cu tine."},{"id":"acceptance-3","category":"acceptance","text":"Poți recunoaște o limită fără să o transformi într-un verdict despre tine."},{"id":"acceptance-4","category":"acceptance","text":"Ce s-a întâmplat nu poate fi schimbat, dar felul în care îl porți mai poate respira."},{"id":"acceptance-5","category":"acceptance","text":"Nu orice zi grea are un motiv clar. Uneori e doar o zi grea."},{"id":"acceptance-6","category":"acceptance","text":"Să accepți nu înseamnă să renunți. Înseamnă să încetezi să mai negociezi cu realitatea."},{"id":"acceptance-7","category":"acceptance","text":"Ai dreptul la tristețe fără să o justifici în fața nimănui."},{"id":"acceptance-8","category":"acceptance","text":"Nu toți oamenii vor înțelege. Nu e nevoie să fii înțeles de toți ca să fii valid."},{"id":"acceptance-9","category":"acceptance","text":"Imperfecțiunea nu este o greșeală de construcție. Este felul în care arată o viață reală."},{"id":"acceptance-10","category":"acceptance","text":"Poți păstra o parte din trecut fără să locuiești în ea."},{"id":"acceptance-11","category":"acceptance","text":"Lasă gândul să treacă fără să-l urmărești până la capăt. Se întoarce mai blând dacă nu-l alungi."},{"id":"acceptance-12","category":"acceptance","text":"Ai făcut tot ce ai putut cu ce știai atunci. Azi știi mai mult, iar asta nu schimbă ziua de ieri."},{"id":"acceptance-13","category":"acceptance","text":"Pacea nu vine din a controla totul, ci din a recunoaște ce nu stă în puterea ta."},{"id":"calm-1","category":"calm","text":"Dă-ți voie să respiri mai încet decât gândurile tale."},{"id":"calm-2","category":"calm","text":"Nu trebuie să umpli liniștea. Ea știe să stea singură."},{"id":"calm-3","category":"calm","text":"Pune-ți umerii jos, ca și cum ai lăsa o geantă pe care o cărai fără să-ți dai seama."},{"id":"calm-4","category":"calm","text":"Pentru un minut, nimic nu îți cere răspuns. Ascultă doar cum se așază camera în jurul tău."},{"id":"calm-5","category":"calm","text":"Mintea poate fi o apă agitată. Nu o lovi, lasă-o să se limpezească."},{"id":"calm-6","category":"calm","text":"Simte unde îți atinge corpul locul pe care stai. Acolo ești deja în siguranță."},{"id":"calm-7","category":"calm","text":"Un lucru la un moment dat. Acum, doar acesta: expirația."},{"id":"calm-8","category":"calm","text":"Nu e nevoie de o oră întreagă de pace. Câteva clipe sincere ajung să schimbe tonul zilei."},{"id":"calm-9","category":"calm","text":"Lasă maxilarul să se relaxeze și fruntea să se netezească. Corpul înțelege înaintea cuvintelor."},{"id":"calm-10","category":"calm","text":"Zgomotul din interior nu e dușmanul tău. Doar nu are nevoie de tot spațiul."},{"id":"calm-11","category":"calm","text":"Încetinește. Nu pentru că ai timp, ci pentru că meriți ritmul acesta."},{"id":"calm-12","category":"calm","text":"Privește ceva departe pe fereastră și lasă ochii să se odihnească."},{"id":"calm-13","category":"calm","text":"Liniștea nu este golul dintre lucruri. Este locul în care ele se pot aranja singure."},{"id":"trust-1","category":"trust","text":"Ai mai găsit drumul înainte, chiar și atunci când nu aveai hartă."},{"id":"trust-2","category":"trust","text":"Poți avea încredere în tine fără să ai toate garanțiile. Încrederea se construiește prin pași mici repetați."},{"id":"trust-3","category":"trust","text":"Intuiția ta nu e perfectă, dar nici nu e inutilă. Ascultă-o cu blândețe și verific-o cu răbdare."},{"id":"trust-4","category":"trust","text":"Nu ești același om de acum un an. Ai crescut în moduri pe care nu le-ai numărat."},{"id":"trust-5","category":"trust","text":"Câteodată încrederea este doar decizia de a face următorul pas fără să vezi tot drumul."},{"id":"trust-6","category":"trust","text":"Oamenii potriviți nu cer să fii altcineva ca să rămână lângă tine."},{"id":"trust-7","category":"trust","text":"O greșeală nu îți anulează judecata. Îți arată doar unde să o rafinezi."},{"id":"trust-8","category":"trust","text":"Ai dreptul să te răzgândești, să încetinești, să o iei de la capăt."},{"id":"trust-9","category":"trust","text":"Ritmul tău este valid, chiar dacă nu seamănă cu al celor din jur."},{"id":"trust-10","category":"trust","text":"Să te sprijini pe cineva nu te face mai puțin independent. Te face om."},{"id":"trust-11","category":"trust","text":"Ai deja în tine mai multe resurse decât îți amintești în clipele grele."},{"id":"trust-12","category":"trust","text":"Încrederea nu vine întotdeauna ca o certitudine. Uneori vine ca o liniște mică în fața unei decizii."},{"id":"trust-13","category":"trust","text":"Ce ai început cu intenție bună nu se pierde, chiar dacă nu se vede încă rezultatul."},{"id":"gratitude-1","category":"gratitude","text":"Poate nu totul e bine, dar poți observa ce e încă în picioare. Începe cu un lucru mic."},{"id":"gratitude-2","category":"gratitude","text":"Mulțumește pentru un lucru simplu din ziua de azi: o gură de aer, o voce cunoscută, o clipă de soare."},{"id":"gratitude-3","category":"gratitude","text":"Recunoștința nu cere să negi greutatea. Poate sta lângă ea, fără să o șteargă."},{"id":"gratitude-4","category":"gratitude","text":"Gândește-te la un om care ți-a făcut vreodată viața puțin mai ușoară. Merită să-i spui."},{"id":"gratitude-5","category":"gratitude","text":"Corpul tău te-a purtat prin tot ce ai trăit. Poți să-i spui un mulțumesc."},{"id":"gratitude-6","category":"gratitude","text":"Sunt lucruri mici care ne țin pe linia de plutire: o cafea, un mesaj, o plimbare scurtă."},{"id":"gratitude-7","category":"gratitude","text":"A observa binele nu înseamnă a ignora răul. Înseamnă a avea o imagine mai completă."},{"id":"gratitude-8","category":"gratitude","text":"Ce ai primit în trecut, chiar și dintr-o relație care s-a încheiat, poate fi recunoscut fără durere."},{"id":"gratitude-9","category":"gratitude","text":"Poți fi recunoscător și obosit în același timp. Ambele sunt adevărate."},{"id":"gratitude-10","category":"gratitude","text":"Uită-te la mâinile tale. Ele au făcut mult, mult mai mult decât ai notat vreodată."},{"id":"gratitude-11","category":"gratitude","text":"Fiecare zi are măcar o clipă care a fost doar bună. Încearcă s-o găsești pe cea de azi."},{"id":"gratitude-12","category":"gratitude","text":"Să spui mulțumesc în gând este suficient. Nu trebuie să fie un ritual."},{"id":"gratitude-13","category":"gratitude","text":"Binele mic, observat des, ajunge să formeze un fundal diferit."},{"id":"selflove-1","category":"selflove","text":"Vorbește cu tine cum ai vorbi cu un prieten drag aflat în aceeași situație."},{"id":"selflove-2","category":"selflove","text":"Nu trebuie să câștigi dreptul de a te odihni. Îl ai din start."},{"id":"selflove-3","category":"selflove","text":"Nu ești schița unui om mai bun. Ești deja o persoană întreagă, aflată în schimbare."},{"id":"selflove-4","category":"selflove","text":"Poți să-ți fii alături și atunci când nu ești mulțumit de ce ai făcut."},{"id":"selflove-5","category":"selflove","text":"Grija față de tine nu este egoism. Este un fel de a-ți păstra puterea de a fi lângă alții."},{"id":"selflove-6","category":"selflove","text":"Cuvintele aspre pe care ți le spui nu sunt adevăruri. Sunt obiceiuri vechi."},{"id":"selflove-7","category":"selflove","text":"Ai voie să ai nevoi, să le spui și să nu te simți vinovat pentru ele."},{"id":"selflove-8","category":"selflove","text":"Nu trebuie să devii altcineva ca să meriți afecțiune."},{"id":"selflove-9","category":"selflove","text":"Pune o mână pe piept și simte-ți căldura. Ești aici, și asta este de ajuns pentru acum."},{"id":"selflove-10","category":"selflove","text":"Greșelile tale nu te definesc, ci îți arată că ai încercat."},{"id":"selflove-11","category":"selflove","text":"Ai dreptul să ocupi spațiu în propria viață."},{"id":"selflove-12","category":"selflove","text":"Bunătatea față de tine poate începe cu o pauză, nu cu o schimbare majoră."},{"id":"selflove-13","category":"selflove","text":"Nu ești prea sensibil, prea lent sau prea mult. Ești genul de om care simte profund."},{"id":"motivation-1","category":"motivation","text":"Nu trebuie să faci totul azi. Alege un singur lucru și fă-l cu atenție."},{"id":"motivation-2","category":"motivation","text":"Un pas mic repetat bate un salt mare amânat."},{"id":"motivation-3","category":"motivation","text":"Începe cu cea mai mică versiune a sarcinii. Cinci minute sunt un început real."},{"id":"motivation-4","category":"motivation","text":"Progresul nu arată mereu ca progres. Uneori arată ca odihnă, ca răbdare sau ca o decizie de a nu renunța."},{"id":"motivation-5","category":"motivation","text":"Nu aștepta să te simți gata. Gata vine adesea după ce începi."},{"id":"motivation-6","category":"motivation","text":"Ce faci astăzi nu trebuie să fie spectaculos. Trebuie doar să fie sincer."},{"id":"motivation-7","category":"motivation","text":"Dacă ai căzut, nu începe din nou de la zero. Începe de unde ai rămas."},{"id":"motivation-8","category":"motivation","text":"Nu te compara cu cineva aflat într-un alt capitol. Cartea ta are alt ritm."},{"id":"motivation-9","category":"motivation","text":"Dă-ți un obiectiv suficient de mic încât să nu te sperie, dar suficient de real încât să conteze."},{"id":"motivation-10","category":"motivation","text":"Energia revine mai des după mișcare decât după gândit. Ridică-te și fă câțiva pași."},{"id":"motivation-11","category":"motivation","text":"Nu ai nevoie de motivație pentru a începe. Ai nevoie de un prim gest."},{"id":"motivation-12","category":"motivation","text":"Fiecare lucru dus până la capăt, oricât de mic, îți spune că te poți baza pe tine."},{"id":"motivation-13","category":"motivation","text":"Mâine te va găsi mai aproape de ceea ce vrei dacă azi faci doar ce poți."}],"TRACKS":[{"id":"piano-1","title":"Primele raze","category":"piano","kind":"piano","seed":1,"duration":600},{"id":"piano-2","title":"Respiră încet","category":"piano","kind":"piano","seed":2,"duration":600},{"id":"piano-3","title":"Seară caldă","category":"piano","kind":"piano","seed":3,"duration":600},{"id":"ocean-1","title":"Orizont deschis","category":"ocean","kind":"ocean","seed":1,"duration":600},{"id":"ocean-2","title":"Maree blândă","category":"ocean","kind":"waves","seed":2,"duration":600},{"id":"ocean-3","title":"Spumă și lumină","category":"ocean","kind":"waves","seed":3,"duration":600},{"id":"forest-1","title":"Poiană luminată","category":"forest","kind":"forest","seed":1,"duration":600},{"id":"forest-2","title":"Pârâu în pădure","category":"forest","kind":"water","seed":2,"duration":600},{"id":"forest-3","title":"Frunze în vânt","category":"forest","kind":"forest","seed":3,"duration":600},{"id":"relax-1","title":"Adâncul liniștii","category":"relaxation","kind":"ambient","seed":1,"duration":600},{"id":"relax-2","title":"Plutire","category":"relaxation","kind":"ambient","seed":2,"duration":600},{"id":"relax-3","title":"Lumină difuză","category":"relaxation","kind":"ambient","seed":3,"duration":600},{"id":"motiv-1","title":"Un nou început","category":"motivation","kind":"uplift","seed":1,"duration":600},{"id":"motiv-2","title":"Pas cu pas","category":"motivation","kind":"uplift","seed":2,"duration":600},{"id":"motiv-3","title":"Dimineață senină","category":"motivation","kind":"uplift","seed":3,"duration":600},{"id":"sleep-1","title":"Cer înstelat","category":"sleep","kind":"night","seed":1,"duration":600},{"id":"sleep-2","title":"Ploaie pe geam","category":"sleep","kind":"rain","seed":2,"duration":600},{"id":"sleep-3","title":"Valuri de noapte","category":"sleep","kind":"waves","seed":3,"duration":600},{"id":"sleep-4","title":"Pădure nocturnă","category":"sleep","kind":"night","seed":4,"duration":600},{"id":"sleep-5","title":"Vis ambiental","category":"sleep","kind":"ambient","seed":5,"duration":600}],"EXPERIENCES":[{"mood":"anxious","label":"Sunt anxios.","title":"Anxietate","scene":"waves","sound":"piano","musicLabel":"Pian ambiental","message":"Nu trebuie să găsești toate răspunsurile acum. Ești aici, în acest moment. Poți începe cu un singur pas.","breathing":true},{"mood":"sad","label":"Sunt trist.","title":"Tristețe","scene":"forest-rays","sound":"piano","musicLabel":"Pian delicat","message":"Uneori, sufletul are nevoie de liniște. Nu trebuie să te grăbești să fii bine."},{"mood":"stressed","label":"Sunt stresat.","title":"Stres","scene":"green-forest","sound":"water","musicLabel":"Apă curgătoare","message":"Ai voie să te oprești. Nu toate lucrurile trebuie rezolvate astăzi."},{"mood":"tired","label":"Sunt obosit.","title":"Oboseală","scene":"sunset-sea","sound":"ambient","musicLabel":"Ambiental lent","message":"Ai făcut suficient pentru moment. Odihna este o nevoie, nu o slăbiciune."},{"mood":"motivation","label":"Am nevoie de motivație.","title":"Motivație","scene":"mountain-sunrise","sound":"uplift","musicLabel":"Instrumental pozitiv","message":"Fiecare început are propria frumusețe. Nu trebuie să faci pași mari pentru a merge înainte."},{"mood":"relax","label":"Vreau să mă relaxez.","title":"Relaxare","scene":"tropical-beach","sound":"waves","musicLabel":"Valuri","message":"Acum nu trebuie să demonstrezi nimic. Acest moment este doar pentru tine."}],"SCENES":[{"id":"sunrise-ocean","name":"Răsărit peste ocean","gradient":"radial-gradient(120% 70% at 50% 62%, #F8E3B5 0%, #E8C98B 22%, #E9B9A0 40%, #A7C7E7 70%, #7FA0C4 100%)"},{"id":"waves","name":"Valuri lente","gradient":"linear-gradient(180deg, #CFE3F2 0%, #A7C7E7 35%, #6E9BBE 70%, #4B7396 100%)"},{"id":"forest-rays","name":"Raze printre copaci","gradient":"radial-gradient(90% 60% at 70% 10%, #F6E7BE 0%, #CBD9A8 28%, #8FAE8F 60%, #4F6F57 100%)"},{"id":"misty-mountains","name":"Munți în ceață","gradient":"linear-gradient(180deg, #E8EEF2 0%, #C9D6E2 30%, #A8B9CC 60%, #7F93A8 100%)"},{"id":"flower-field","name":"Câmp cu flori","gradient":"radial-gradient(100% 60% at 50% 100%, #C8B6E2 0%, #B9C9A0 40%, #A7C7E7 80%, #D8E6F2 100%)"},{"id":"night-stars","name":"Cer înstelat","gradient":"linear-gradient(180deg, #070B1A 0%, #121B3A 55%, #25305A 100%)","dark":true},{"id":"rain-window","name":"Ploaie la fereastră","gradient":"linear-gradient(180deg, #2B3547 0%, #3C4A60 55%, #56667E 100%)","dark":true},{"id":"sunset-sea","name":"Apus deasupra mării","gradient":"radial-gradient(120% 70% at 50% 60%, #F6D6A0 0%, #E7A98A 28%, #B78AAE 55%, #5E6A9B 85%, #2F3A66 100%)"},{"id":"green-forest","name":"Pădure verde","gradient":"linear-gradient(180deg, #D3E3C9 0%, #A8BFA8 40%, #6F8F76 75%, #3F5C49 100%)"},{"id":"mountain-sunrise","name":"Răsărit peste munți","gradient":"radial-gradient(110% 70% at 50% 55%, #F8E3B5 0%, #E8C98B 25%, #C8B6E2 55%, #8DA6C9 85%, #5F7BA3 100%)"},{"id":"tropical-beach","name":"Plajă tropicală","gradient":"linear-gradient(180deg, #CFEAF5 0%, #A7DCE0 35%, #8FD0C6 55%, #F3E6C8 80%, #F8F3EA 100%)"}],"CATEGORY_NAMES":{"hope":"Speranță","courage":"Curaj","acceptance":"Acceptare","calm":"Liniște","trust":"Încredere","gratitude":"Recunoștință","selflove":"Iubire de sine","motivation":"Motivație"},"CATEGORY_LABELS":{"piano":"Peaceful Piano","ocean":"Ocean Dreams","forest":"Forest Sounds","relaxation":"Deep Relaxation","motivation":"Gentle Motivation","sleep":"Sleep Sanctuary"}};
+const LABELS = Object.assign({}, D.CATEGORY_LABELS, {mine:'Melodiile mele'});
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const I = {
+  home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>',
+  music:'<svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>',
+  breath:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg>',
+  msg:'<svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-5 4v-4H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>',
+  user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>',
+  play:'<svg class="f" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.5-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>',
+  pause:'<svg class="f" viewBox="0 0 24 24"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg>',
+  next:'<svg viewBox="0 0 24 24"><path d="M6 6l9 6-9 6z"/><path d="M18 6v12"/></svg>',
+  prev:'<svg viewBox="0 0 24 24"><path d="M18 6l-9 6 9 6z"/><path d="M6 6v12"/></svg>',
+  rep:'<svg viewBox="0 0 24 24"><path d="M17 3l3 3-3 3"/><path d="M4 11V9a3 3 0 0 1 3-3h13"/><path d="M7 21l-3-3 3-3"/><path d="M20 13v2a3 3 0 0 1-3 3H4"/></svg>',
+  heart:f=>`<svg ${f?'class="f"':''} viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>`,
+  moon:'<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>',
+  share:'<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/></svg>',
+  spk:'<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  back:'<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+  help:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><path d="M12 17h.01"/></svg>',
+  timer:'<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 1.5M9.5 3h5"/></svg>'
+};
+const fmt = s => Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
+
+/* ---------------- preferences (in memory, saved when the browser allows) ---------------- */
+const P = {voice:false, music:.6, voiceVol:.9, scene:'auto', favQ:[], favT:[], session:5, pace:4, still:false, moodTrack:{}};
+try { Object.assign(P, JSON.parse(localStorage.getItem('soul.demo') || '{}')); } catch(e) {}
+const savePrefs = () => { try { localStorage.setItem('soul.demo', JSON.stringify(P)); } catch(e) {} };
+
+/* ---------------- audio engine (generated sounds, Web Audio API) ---------------- */
+const mulberry = a => () => { a|=0; a=a+0x6d2b79f5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return((t^t>>>14)>>>0)/4294967296; };
+const midi = n => 440*Math.pow(2,(n-69)/12);
+const MINOR = [57,60,62,64,67,69,72,74,76].map(midi), MAJOR = [60,62,64,67,69,72,74,76,79].map(midi);
+const Eng = {
+  ctx:null, stoppers:[], soundGain:null, key:'', playing:false,
+  ensure(){
+    if (this.ctx) return this.ctx;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) throw new Error('no audio');
+    const c = this.ctx = new AC();
+    this.sleep = c.createGain(); this.duckG = c.createGain(); this.music = c.createGain();
+    this.duckG.connect(this.sleep); this.sleep.connect(this.music); this.music.connect(c.destination);
+    this.music.gain.value = P.music;
+    const len = c.sampleRate*3, ir = c.createBuffer(2,len,c.sampleRate);
+    for (let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6);}
+    this.rev = c.createConvolver(); this.rev.buffer = ir;
+    const nl = c.sampleRate*6; this.nb = c.createBuffer(1,nl,c.sampleRate);
+    const nd = this.nb.getChannelData(0); for(let i=0;i<nl;i++)nd[i]=Math.random()*2-1;
+    return c;
+  },
+  setVol(v){ if(this.ctx) this.music.gain.setTargetAtTime(v,this.ctx.currentTime,.08); },
+  duck(){ if(!this.ctx)return; this.duckG.gain.cancelScheduledValues(this.ctx.currentTime); this.duckG.gain.setTargetAtTime(.22,this.ctx.currentTime,.3); },
+  unduck(){ if(!this.ctx)return; this.duckG.gain.cancelScheduledValues(this.ctx.currentTime); this.duckG.gain.setTargetAtTime(1,this.ctx.currentTime,1.2); },
+  fadeOut(sec){ if(!this.ctx)return; const t=this.ctx.currentTime; this.sleep.gain.cancelScheduledValues(t); this.sleep.gain.setValueAtTime(this.sleep.gain.value,t); this.sleep.gain.linearRampToValueAtTime(.0001,t+sec); },
+  resetFade(){ if(!this.ctx)return; this.sleep.gain.cancelScheduledValues(this.ctx.currentTime); this.sleep.gain.setValueAtTime(1,this.ctx.currentTime); },
+  async play(kind,seed){
+    const c = this.ensure(); if (c.state==='suspended') await c.resume();
+    this.killSources(.6); this.resetFade(); this.playing = true;
+    const out = c.createGain(); out.gain.value = 0; out.connect(this.duckG); this.soundGain = out;
+    out.gain.setTargetAtTime(1,c.currentTime,.6);
+    this.gen(kind, seed, out);
+  },
+  el:null,
+  pause(){ if(this.ctx&&this.playing){ this.playing=false; if(this.el)this.el.pause(); this.ctx.suspend(); } },
+  async resume(){ if(this.ctx){ await this.ctx.resume(); if(this.el) await this.el.play().catch(()=>{}); this.playing=true; } },
+  decode(ab){ const c=this.ensure(); return new Promise((res,rej)=>{ try{ const r=c.decodeAudioData(ab.slice(0),res,rej); if(r&&r.then)r.then(res,rej); }catch(e){rej(e)} }); },
+  newOut(){ const c=this.ctx; this.killSources(.5); this.resetFade(); this.playing=true; const out=c.createGain(); out.gain.value=0; out.connect(this.duckG); this.soundGain=out; out.gain.setTargetAtTime(1,c.currentTime,.4); return out; },
+  async playMedia(blob,offset){
+    const c=this.ensure(); if(c.state==='suspended') await c.resume();
+    const url=URL.createObjectURL(blob); const el=new Audio(); el.loop=true; el.preload='auto'; el.src=url;
+    try{
+      await new Promise((res,rej)=>{ el.onloadedmetadata=res; el.onerror=()=>rej(new Error('media')); setTimeout(()=>rej(new Error('timeout')),8000); });
+      if(offset) el.currentTime=offset;
+      const out=this.newOut(); const node=c.createMediaElementSource(el); node.connect(out);
+      this.stoppers.push(()=>{ el.pause(); try{node.disconnect()}catch(e){} URL.revokeObjectURL(url); });
+      await el.play(); this.el=el; return el.duration;
+    }catch(e){ URL.revokeObjectURL(url); throw e; }
+  },
+  async playBuffer(buf,offset){
+    const c=this.ensure(); if(c.state==='suspended') await c.resume();
+    const out=this.newOut(); const src=c.createBufferSource(); src.buffer=buf; src.loop=true; src.connect(out); src.start(0,(offset||0)%buf.duration);
+    this.stoppers.push(()=>src.stop());
+  },
+  stop(){ this.killSources(.4); this.playing=false; },
+  killSources(f){
+    this.stoppers.forEach(s=>{try{s()}catch(e){}}); this.stoppers=[]; this.el=null;
+    if(this.ctx&&this.soundGain){ const g=this.soundGain; g.gain.cancelScheduledValues(this.ctx.currentTime); g.gain.setTargetAtTime(0,this.ctx.currentTime,f/3); setTimeout(()=>g.disconnect(),f*1000+200); this.soundGain=null; }
+  },
+  noise(){ const s=this.ctx.createBufferSource(); s.buffer=this.nb; s.loop=true; s.loopStart=Math.random()*2; return s; },
+  lfo(f,depth,param){ const c=this.ctx,o=c.createOscillator(),g=c.createGain(); o.frequency.value=f; g.gain.value=depth; o.connect(g); g.connect(param); o.start(); return()=>o.stop(); },
+  every(ms,fn){ let id=0,alive=true; const tick=()=>{if(!alive)return;fn();id=setTimeout(tick,ms());}; id=setTimeout(tick,200); return()=>{alive=false;clearTimeout(id)}; },
+  note(out,f,when,dur,vol){
+    const c=this.ctx,o1=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),g2=c.createGain();
+    o1.type='sine'; o2.type='triangle'; o1.frequency.value=f; o2.frequency.value=f*2.005; g2.gain.value=.18;
+    o1.connect(g); o2.connect(g2); g2.connect(g);
+    g.gain.setValueAtTime(0,when); g.gain.linearRampToValueAtTime(vol,when+.02); g.gain.exponentialRampToValueAtTime(.0001,when+dur);
+    const dry=c.createGain(); dry.gain.value=.55; const wet=c.createGain(); wet.gain.value=.7;
+    g.connect(dry); g.connect(wet); dry.connect(out); wet.connect(this.rev); this.rev.connect(out);
+    o1.start(when); o2.start(when); o1.stop(when+dur+.1); o2.stop(when+dur+.1);
+  },
+  gen(kind,seed,out){
+    const r = mulberry(seed*7919 + kind.length*31), c = this.ctx, S = this.stoppers;
+    const pad=(notes,vol)=>{
+      const bus=c.createGain(); bus.gain.value=vol*.35; const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=900;
+      bus.connect(lp); lp.connect(out); const wet=c.createGain(); wet.gain.value=.5; lp.connect(wet); wet.connect(this.rev); this.rev.connect(out);
+      const oscs=[];
+      notes.forEach((n,i)=>[-6,6].forEach(d=>{const o=c.createOscillator(); o.type=i%2?'sine':'triangle'; o.frequency.value=midi(n); o.detune.value=d+(r()-.5)*4;
+        const g=c.createGain(); g.gain.value=.5; S.push(this.lfo(.04+r()*.06,.25,g.gain)); o.connect(g); g.connect(bus); o.start(); oscs.push(o);}));
+      S.push(this.lfo(.03,250,lp.frequency)); S.push(()=>oscs.forEach(o=>o.stop()));
+    };
+    const waves=(rate,cut,level,deep)=>{
+      const n=this.noise(); n.start(); const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=cut;
+      const sw=c.createGain(); sw.gain.value=level*.5; n.connect(lp); lp.connect(sw); sw.connect(out);
+      S.push(this.lfo(rate,level*.45,sw.gain)); S.push(this.lfo(rate,cut*.5,lp.frequency)); S.push(()=>n.stop()); if(deep)pad([38,45],.15);
+    };
+    if(kind==='piano'){ let idx=3; S.push(this.every(()=>1800+r()*2600,()=>{ idx=Math.max(0,Math.min(MINOR.length-1,idx+Math.round((r()-.5)*4)));
+        this.note(out,MINOR[idx],c.currentTime+.02,4.2,.16); if(r()>.62)this.note(out,MINOR[Math.max(0,idx-2)]/2,c.currentTime+.4,5.2,.1); })); }
+    else if(kind==='uplift'){ pad([48,55,60,64],.28); let st=0; S.push(this.every(()=>650,()=>{ this.note(out,MAJOR[(st*2+Math.floor(r()*2))%MAJOR.length],c.currentTime+.02,2.2,.1); st=(st+1)%8; })); }
+    else if(kind==='ocean') waves(.09,700,.55,true);
+    else if(kind==='waves') waves(.12,900,.5,false);
+    else if(kind==='rain'){
+      const n=this.noise(); n.start(); const hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1400; const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=7500;
+      const g=c.createGain(); g.gain.value=.22; n.connect(hp); hp.connect(lp); lp.connect(g); g.connect(out); S.push(()=>n.stop());
+      S.push(this.every(()=>120+r()*380,()=>{const o=c.createOscillator(),dg=c.createGain(),t=c.currentTime; o.frequency.value=1800+r()*2200;
+        dg.gain.setValueAtTime(0,t); dg.gain.linearRampToValueAtTime(.025,t+.004); dg.gain.exponentialRampToValueAtTime(.0001,t+.09); o.connect(dg); dg.connect(out); o.start(t); o.stop(t+.12);}));
+    }
+    else if(kind==='water'){
+      const n=this.noise(); n.start(); const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=900; bp.Q.value=.7; const g=c.createGain(); g.gain.value=.4;
+      n.connect(bp); bp.connect(g); g.connect(out); S.push(this.lfo(.31,250,bp.frequency)); S.push(this.lfo(.13,.08,g.gain)); S.push(()=>n.stop());
+      S.push(this.every(()=>180+r()*600,()=>{const o=c.createOscillator(),bg=c.createGain(),t=c.currentTime,f=500+r()*900;
+        o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(f*1.8,t+.08); bg.gain.setValueAtTime(0,t); bg.gain.linearRampToValueAtTime(.03,t+.01); bg.gain.exponentialRampToValueAtTime(.0001,t+.12);
+        o.connect(bg); bg.connect(out); o.start(t); o.stop(t+.15);}));
+    }
+    else if(kind==='forest'){
+      const n=this.noise(); n.start(); const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=500; const wg=c.createGain(); wg.gain.value=.18;
+      n.connect(lp); lp.connect(wg); wg.connect(out); S.push(this.lfo(.07,.1,wg.gain)); S.push(()=>n.stop());
+      S.push(this.every(()=>2500+r()*5000,()=>{const t0=c.currentTime,base=2200+r()*1800,cnt=2+Math.floor(r()*3);
+        for(let i=0;i<cnt;i++){const t=t0+i*.16,o=c.createOscillator(),g=c.createGain(); o.frequency.setValueAtTime(base,t); o.frequency.exponentialRampToValueAtTime(base*(1.15+r()*.3),t+.1);
+          g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.035,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+.13); o.connect(g); g.connect(out); o.start(t); o.stop(t+.16);}}));
+      pad([43,50,55],.14);
+    }
+    else if(kind==='night'){
+      pad([38,45,50,57],.35); const o=c.createOscillator(),g=c.createGain(); o.frequency.value=4300; g.gain.value=0; S.push(this.lfo(5.5,.006,g.gain)); o.connect(g); g.connect(out); o.start(); S.push(()=>o.stop());
+      S.push(this.every(()=>3500+r()*6000,()=>this.note(out,MAJOR[5+Math.floor(r()*4)]*2,c.currentTime+.02,3,.05)));
+    }
+    else pad([45,52,57,60],.5);
+  }
+};
+
+
+/* ---------------- your own songs (stored on this phone, in IndexedDB) ---------------- */
+const probe = blob => new Promise(res=>{ const u=URL.createObjectURL(blob), a=new Audio(); a.preload='metadata';
+  const done=d=>{ URL.revokeObjectURL(u); res(d); }; a.onloadedmetadata=()=>done(isFinite(a.duration)?a.duration:0); a.onerror=()=>done(0); setTimeout(()=>done(0),6000); a.src=u; });
+const Lib = {
+  db:null, ok:false, items:[], mem:{}, cache:null,
+  open(){ return new Promise(res=>{ try{ const r=indexedDB.open('soul-lib',1); r.onupgradeneeded=()=>r.result.createObjectStore('tracks',{keyPath:'id'}); r.onsuccess=()=>{this.db=r.result;res(true)}; r.onerror=()=>res(false); r.onblocked=()=>res(false); }catch(e){res(false)} }); },
+  store(mode){ return this.db.transaction('tracks',mode).objectStore('tracks'); },
+  req(r){ return new Promise((res,rej)=>{ r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); },
+  async load(){
+    this.ok=await this.open(); if(!this.ok) return;
+    try{ const all=await this.req(this.store('readonly').getAll()); this.items=all.map(({data,type,...m})=>m).sort((a,b)=>a.added-b.added); }catch(e){ this.ok=false; }
+  },
+  async add(file){
+    if(file.size>60*1048576) throw new Error('„'+file.name+'” este prea mare (maxim 60 MB).');
+    const data=await file.arrayBuffer(), type=file.type||'audio/mpeg';
+    let dur=await probe(new Blob([data],{type}));
+    if(!dur){ try{ dur=(await Eng.decode(data)).duration; }catch(e){} }
+    if(!dur||!isFinite(dur)) throw new Error('Nu pot reda „'+file.name+'”. Folosește MP3, M4A, WAV sau OGG.');
+    const meta={id:'u-'+Date.now()+Math.random().toString(36).slice(2,6),title:file.name.replace(/\.[^.]+$/,''),category:'mine',kind:'user',seed:0,duration:Math.round(dur),added:Date.now()};
+    if(this.ok){ try{ await this.req(this.store('readwrite').put({...meta,data,type})); }catch(e){ this.ok=false; this.mem[meta.id]={data,type}; } }
+    else this.mem[meta.id]={data,type};
+    this.items.push(meta); return meta;
+  },
+  async get(id){ if(this.mem[id]) return this.mem[id]; if(!this.ok) return null; try{ return await this.req(this.store('readonly').get(id)); }catch(e){ return null; } },
+  async remove(id){
+    this.items=this.items.filter(t=>t.id!==id); delete this.mem[id]; if(this.cache&&this.cache.id===id) this.cache=null;
+    if(this.ok){ try{ await this.req(this.store('readwrite').delete(id)); }catch(e){} }
+    P.favT=P.favT.filter(x=>x!==id); for(const m in P.moodTrack) if(P.moodTrack[m]===id) delete P.moodTrack[m]; savePrefs();
+  }
+};
+
+/* ---------------- player ---------------- */
+const Pl = { now:null, playing:false, elapsed:0, repeat:false, timerLeft:null, fading:false, tick:null };
+async function startSound(n){
+  try{
+    Pl.fading=false; await Eng.play(n.kind,n.seed); Pl.now=n; Pl.elapsed=0; Pl.playing=true; Pl.err=null;
+  }catch(e){ Pl.err='Acest browser nu a putut porni sunetul. Atinge din nou butonul de redare.'; Pl.playing=false; }
+  runTicker(); refreshPlayerUI();
+}
+const allTracks = () => D.TRACKS.concat(Lib.items);
+const trackById = id => allTracks().find(t=>t.id===id);
+const playTrack = id => { const t=trackById(id); if(!t) return; if(t.kind==='user') return playUser(t,0); return startSound({title:t.title,kind:t.kind,seed:t.seed,trackId:t.id,category:t.category,duration:t.duration}); };
+async function playUser(t,offset=0){
+  try{
+    Pl.fading=false;
+    const rec=await Lib.get(t.id); if(!rec) throw new Error('lipsă');
+    const blob=new Blob([rec.data],{type:rec.type});
+    let dur;
+    try{ dur=await Eng.playMedia(blob,offset); }
+    catch(e1){
+      const buf=(Lib.cache&&Lib.cache.id===t.id)?Lib.cache.buf:await Eng.decode(rec.data);
+      Lib.cache={id:t.id,buf}; await Eng.playBuffer(buf,offset); dur=buf.duration;
+    }
+    Pl.now={title:t.title,kind:'user',seed:0,trackId:t.id,category:'mine',duration:Math.max(1,Math.round(isFinite(dur)&&dur?dur:t.duration))};
+    Pl.elapsed=offset; Pl.playing=true; Pl.err=null;
+  }catch(e){ Pl.err='Nu am putut reda „'+t.title+'”. Încearcă alt fișier (MP3, M4A, WAV, OGG).'; Pl.playing=false; }
+  runTicker(); refreshPlayerUI();
+}
+const MOODS=[['anxious','Anxietate'],['sad','Tristețe'],['stressed','Stres'],['tired','Oboseală'],['motivation','Motivație'],['relax','Relaxare']];
+const moodTrackOf = m => { const id=P.moodTrack[m]; return id ? (Lib.items.find(t=>t.id===id)||null) : null; };
+const moodLabel = e => { const t=moodTrackOf(e.mood); return t?t.title:e.musicLabel; };
+const playMood = e => { const t=moodTrackOf(e.mood); return t ? playUser(t,0) : playKind(e.sound,e.musicLabel); };
+const playKind = (kind,title) => startSound({title,kind,seed:1,duration:3600});
+function queue(){ return Pl.now&&Pl.now.category ? allTracks().filter(t=>t.category===Pl.now.category) : allTracks(); }
+function step(d){ if(!Pl.now||!Pl.now.trackId)return; const q=queue(),i=q.findIndex(t=>t.id===Pl.now.trackId); playTrack(q[(i+d+q.length)%q.length].id); }
+async function toggle(){ if(!Pl.now)return; if(Pl.playing){Eng.pause();Pl.playing=false;}else{await Eng.resume();Pl.playing=true;} refreshPlayerUI(); }
+function stopAll(){ Eng.stop(); Pl.playing=false; Pl.now=null; Pl.elapsed=0; Pl.timerLeft=null; refreshPlayerUI(); }
+function setTimer(m){ Pl.fading=false; Eng.resetFade(); Pl.timerLeft = m==null?null:m*60; refreshPlayerUI(); }
+function runTicker(){
+  clearInterval(Pl.tick);
+  Pl.tick = setInterval(()=>{
+    if(!Pl.playing||!Pl.now)return;
+    Pl.elapsed += 1;
+    if(Pl.elapsed>=Pl.now.duration){ if(Pl.repeat||!Pl.now.trackId) Pl.elapsed=0; else step(1); }
+    if(Pl.timerLeft!=null){
+      Pl.timerLeft -= 1;
+      if(Pl.timerLeft<=60&&!Pl.fading){Pl.fading=true;Eng.fadeOut(Math.max(Pl.timerLeft,1));}
+      if(Pl.timerLeft<=0){ stopAll(); return; }
+    }
+    refreshPlayerUI(true);
+  },1000);
+}
+let msInit=false;
+function syncMedia(){
+  try{
+    if(!('mediaSession' in navigator)) return;
+    if(!msInit){ msInit=true; const ms=navigator.mediaSession;
+      ms.setActionHandler('play',()=>{ if(!Pl.playing) toggle(); }); ms.setActionHandler('pause',()=>{ if(Pl.playing) toggle(); });
+      ms.setActionHandler('nexttrack',()=>step(1)); ms.setActionHandler('previoustrack',()=>step(-1)); }
+    if(Pl.now){ navigator.mediaSession.metadata=new MediaMetadata({title:Pl.now.title,artist:'SOUL',album:'Your Peaceful Place'}); navigator.mediaSession.playbackState=Pl.playing?'playing':'paused'; }
+    else navigator.mediaSession.playbackState='none';
+  }catch(e){}
+}
+function refreshPlayerUI(light){
+  const mini=$('#mini');
+  if(Pl.now&&!state.overlay&&state.tab!=='music'){ mini.classList.add('show'); mini.innerHTML=`<button class="t" data-go="music" aria-label="Deschide playerul"><span class="muted">${Pl.playing?'Se redă · ':'Pauză · '}</span>${esc(Pl.now.title)}</button>
+    <button class="ib" id="mpp" aria-label="${Pl.playing?'Pauză':'Redă'}">${Pl.playing?I.pause:I.play}</button><button class="ib" id="mstop" aria-label="Oprește sunetul">${I.x}</button>`;
+    $('#mpp').onclick=toggle; $('#mstop').onclick=stopAll; $('[data-go]',mini).onclick=()=>go('music');
+  } else { mini.classList.remove('show'); }
+  const pb=$('#pbar'); if(pb&&Pl.now) pb.style.width=Math.min(100,Pl.elapsed/Pl.now.duration*100)+'%';
+  const pe=$('#pel'); if(pe) pe.textContent=fmt(Pl.elapsed);
+  const tl=$('#tleft'); if(tl) tl.textContent = Pl.timerLeft==null?'':fmt(Pl.timerLeft);
+  if(!light){ syncMedia(); const f=state.refresh; if(f) f(); }
+}
+
+/* ---------------- voice (browser voice; AI voice needs a server) ---------------- */
+const Voice = {
+  roVoice(){ if(!('speechSynthesis'in window))return null; const v=speechSynthesis.getVoices().filter(x=>x.lang.toLowerCase().startsWith('ro')); return v.find(x=>/ioana|female|natural|online/i.test(x.name))||v[0]||null; },
+  status(){ return this.roVoice() ? 'Vocea în română a acestui dispozitiv (mai puțin naturală decât o voce AI).' : 'Nu am găsit o voce în română pe acest dispozitiv. Vocea AI naturală necesită serverul din aplicația reală.'; },
+  say(text){
+    return new Promise(res=>{
+      const v=this.roVoice(); if(!v){res(false);return;}
+      const u=new SpeechSynthesisUtterance(text.replace(/([.!?])\s+/g,'$1 … ')); u.voice=v; u.lang=v.lang; u.rate=.82; u.volume=P.voiceVol;
+      u.onend=()=>{Eng.unduck();res(true)}; u.onerror=()=>{Eng.unduck();res(false)};
+      speechSynthesis.cancel(); Eng.duck(); speechSynthesis.speak(u);
+    });
+  },
+  stop(){ if('speechSynthesis'in window)speechSynthesis.cancel(); Eng.unduck(); }
+};
+if('speechSynthesis'in window) speechSynthesis.getVoices();
+
+/* ---------------- background ---------------- */
+const sceneById = id => D.SCENES.find(s=>s.id===id)||D.SCENES[0];
+const FX = {'sunrise-ocean':['glow','waves'],waves:['waves','mist'],'forest-rays':['rays','mist'],'misty-mountains':['mist'],'flower-field':['glow','mist'],'night-stars':['stars'],'rain-window':['rain','mist'],'sunset-sea':['glow','waves'],'green-forest':['rays','mist'],'mountain-sunrise':['glow','mist'],'tropical-beach':['glow','waves']};
+function fxHTML(kinds){
+  let h='';
+  if(kinds.includes('glow')) h+='<div class="fx-glow"></div>';
+  if(kinds.includes('rays')) for(let i=0;i<3;i++) h+=`<div class="fx-ray" style="left:${18+i*24}%;animation-delay:${i*3}s"></div>`;
+  if(kinds.includes('mist')) h+='<div class="fx-mist" style="bottom:12%;height:28%"></div><div class="fx-mist" style="bottom:34%;height:20%;animation-duration:44s;opacity:.6"></div>';
+  if(kinds.includes('waves')) h+='<div class="fx-wave"><svg viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0 90C200 40 400 140 600 90S1000 40 1200 90S1600 140 1800 90S2200 40 2400 90V200H0Z" fill="rgba(248,243,234,.22)"/><path d="M0 120C200 80 400 160 600 120S1000 80 1200 120S1600 160 1800 120S2200 80 2400 120V200H0Z" fill="rgba(167,199,231,.30)"/></svg></div>';
+  if(kinds.includes('stars')) for(let i=0;i<70;i++){const s=1+Math.random()*2; h+=`<span class="fx-star" style="left:${Math.random()*100}%;top:${Math.random()*75}%;width:${s}px;height:${s}px;animation-delay:${Math.random()*6}s;animation-duration:${3+Math.random()*4}s"></span>`;}
+  if(kinds.includes('rain')) for(let i=0;i<34;i++) h+=`<span class="fx-drop" style="left:${Math.random()*100}%;height:${40+Math.random()*60}px;animation-delay:${Math.random()*4}s;animation-duration:${1.6+Math.random()*1.6}s"></span>`;
+  return h;
+}
+let curScene = '';
+function setScene(id){
+  if(id===curScene) return; curScene=id; const sc=sceneById(id), bg=$('#bg');
+  const l=document.createElement('div'); l.className='layer';
+  l.innerHTML=`<div class="grad" style="background:${sc.gradient}"></div>${fxHTML(FX[id]||[])}<div style="position:absolute;inset:0;background:#0e1424;opacity:${sc.dark?.05:.16}"></div>`;
+  bg.appendChild(l); requestAnimationFrame(()=>requestAnimationFrame(()=>l.classList.add('on')));
+  const old=$$('.layer',bg).filter(x=>x!==l); setTimeout(()=>old.forEach(o=>o.remove()),2400); old.forEach(o=>o.classList.remove('on'));
+}
+
+/* ---------------- app state and screens ---------------- */
+const state = { tab:'home', overlay:null, msgScene:0, refresh:null };
+const TAB_SCENE = {home:'sunrise-ocean',music:'waves',breathe:'misty-mountains',messages:'forest-rays',profile:'flower-field'};
+const MSG_SCENES = ['forest-rays','sunrise-ocean','misty-mountains','flower-field','sunset-sea','mountain-sunrise','tropical-beach'];
+const NAV = [['home','Acasă',I.home],['music','Muzică',I.music],['breathe','Respirație',I.breath],['messages','Mesaje',I.msg],['profile','Profil',I.user]];
+const screen = $('#screen');
+let breathTimers = [];
+function clearBreath(){ breathTimers.forEach(t=>{clearTimeout(t);clearInterval(t)}); breathTimers=[]; }
+function toast(m){ const t=document.createElement('div'); t.className='toast glassd'; t.setAttribute('role','status'); t.textContent=m; $('#app').appendChild(t); setTimeout(()=>t.remove(),2600); }
+
+function go(tab,opts){
+  Voice.stop(); clearBreath(); state.overlay=null; state.tab=tab; state.refresh=null;
+  render(opts);
+}
+function render(opts){
+  const o=state.overlay; let scene;
+  if(o&&o.type==='exp') scene=D.EXPERIENCES.find(e=>e.mood===o.mood).scene;
+  else if(o&&o.type==='sleep') scene='night-stars';
+  else if(P.scene!=='auto') scene=P.scene;
+  else if(state.tab==='messages') scene=MSG_SCENES[state.msgScene%MSG_SCENES.length];
+  else scene=TAB_SCENE[state.tab];
+  setScene(scene);
+  $('#app').classList.toggle('still',P.still);
+  $('#nav').innerHTML = NAV.map(([id,l,ic])=>`<button data-tab="${id}" class="${!o&&state.tab===id||o&&o.type==='help'&&id==='profile'?'on':''}" ${!o&&state.tab===id?'aria-current="page"':''}>${ic}${l}</button>`).join('');
+  $$('#nav [data-tab]').forEach(b=>b.onclick=()=>go(b.dataset.tab));
+  screen.scrollTop=0;
+  const v = o ? (o.type==='exp'?vExp(o.mood):o.type==='sleep'?vSleep():vHelp()) : ({home:vHome,music:vMusic,breathe:()=>vBreathe(opts&&opts.auto),messages:vMessages,profile:vProfile})[state.tab]();
+  screen.innerHTML=''; screen.appendChild(v); refreshPlayerUI(true);
+}
+const h = html => { const d=document.createElement('div'); d.className='view'; d.innerHTML=html; return d; };
+const sliderHTML=(id,label,val,min,max,step,fm)=>`<label class="sl"><div><span>${label}</span><span id="${id}-v">${fm(val)}</span></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" aria-label="${label}"></label>`;
+const pct = v => Math.round(v*100)+'%';
+
+function vHome(){
+  const q = D.QUOTES[Math.floor((Date.now()/864e5)) % D.QUOTES.length];
+  const v = h(`<div class="center" style="padding-top:34px" id="hm">
+    <div id="welcome">
+      <h1 class="soft" style="font-size:72px;letter-spacing:.35em;margin-right:-.35em">SOUL</h1>
+      <p class="disp soft" style="font-size:23px;font-style:italic;margin:16px 0 0">„Un loc în care sufletul tău poate respira.”</p>
+      <p class="soft" style="max-width:300px;margin:26px auto 0;line-height:1.65">Bine ai venit. Pentru câteva clipe, lasă grijile deoparte. Acest moment îți aparține.</p>
+      <button class="btn" id="begin" style="margin-top:34px">ÎNCEPE EXPERIENȚA</button>
+      <div style="margin-top:34px"><button class="glassd row" id="tosleep" style="border-radius:99px;padding:10px 20px;gap:12px;text-align:left"><span class="ico">${I.moon}</span><span><b style="display:block;font-size:14px">Sleep Sanctuary</b><span class="muted">Un colț întunecat și blând pentru noapte</span></span></button></div>
+      <div class="glass card" style="margin-top:22px"><div class="eyebrow">Mesajul zilei</div><p class="disp" style="font-size:21px;line-height:1.3;margin:8px 0 0">${esc(q.text)}</p></div>
+    </div>
+  </div>`);
+  $('#begin',v).onclick=()=>{ $('#hm',v).innerHTML=`<div style="padding-top:44px"><h2 class="soft" style="font-size:36px;margin-bottom:26px">Cum te simți astăzi?</h2>${D.EXPERIENCES.map(e=>`<button class="mood glass" data-m="${e.mood}">${esc(e.label)}</button>`).join('')}<button class="muted" id="bk" style="margin-top:14px;text-decoration:underline">Înapoi</button></div>`;
+    $$('[data-m]',v).forEach(b=>b.onclick=()=>{ state.overlay={type:'exp',mood:b.dataset.m}; render(); });
+    $('#bk',v).onclick=()=>go('home'); };
+  $('#tosleep',v).onclick=()=>{ state.overlay={type:'sleep'}; render(); };
+  return v;
+}
+
+function vExp(mood){
+  const e = D.EXPERIENCES.find(x=>x.mood===mood);
+  const v = h(`<div style="display:flex;flex-direction:column;min-height:calc(100vh - 220px)">
+    <div class="row" style="justify-content:space-between"><button class="ib" id="bk" aria-label="Înapoi">${I.back}</button><span class="eyebrow">${e.title}</span><span style="width:44px"></span></div>
+    <div class="center" style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;padding:30px 0">
+      <p class="disp soft" style="font-size:28px;line-height:1.3;max-width:340px;margin:0">${esc(e.message)}</p>
+      <div class="glass row" style="border-radius:99px;padding:6px 20px 6px 6px;gap:10px;margin-top:14px"><button class="ib" id="pp" aria-label="Redă / pauză"></button><span style="text-align:left;font-size:14px"><span class="muted" id="st" style="display:block"></span>${esc(moodLabel(e))}</span></div>
+      <button class="row muted" id="listen" style="gap:8px;color:rgba(248,243,234,.85);font-size:14px"><span class="ico">${I.spk}</span>Ascultă</button>
+      <p class="muted" id="vnote" style="max-width:300px;margin:0" hidden></p>
+      <p class="muted" id="perr" style="max-width:300px;margin:0;color:var(--gold)" hidden></p>
+      ${e.breathing?'<button class="btn sm" id="tobreath">Încearcă un exercițiu de respirație</button>':''}
+    </div></div>`);
+  const upd=()=>{ $('#pp',v).innerHTML=Pl.playing?I.pause:I.play; $('#st',v).textContent=Pl.playing?'Se redă':'Muzică'; const pe=$('#perr',v); pe.hidden=!Pl.err; pe.textContent=Pl.err||''; };
+  state.refresh=upd; upd();
+  $('#pp',v).onclick=async()=>{ if(!Pl.now) await playMood(e); else await toggle(); upd(); };
+  $('#bk',v).onclick=()=>{ Voice.stop(); state.overlay=null; render(); };
+  const say=async force=>{ if(!force&&!P.voice)return; const ok=await Voice.say(e.message); if(!ok&&force){const n=$('#vnote',v);n.hidden=false;n.textContent='Vocea nu este disponibilă pe acest dispozitiv. Citește mesajul din ecran; muzica funcționează normal.';} };
+  $('#listen',v).onclick=()=>say(true);
+  const tb=$('#tobreath',v); if(tb) tb.onclick=()=>go('breathe',{auto:true});
+  playMood(e).then(()=>{ upd(); setTimeout(()=>say(false),2500); });
+  return v;
+}
+
+function vMusic(){
+  let cat=Lib.items.length?'mine':'piano', armed=null; const cats=['mine',...Object.keys(D.CATEGORY_LABELS)];
+  const v = h(`<div style="padding-top:22px"><h2 class="soft" style="font-size:38px">Muzică</h2>
+    <p class="muted" style="margin:4px 0 14px">Sunete generate în aplicație sau propriile tale melodii.</p>
+    <div class="chips" id="chips"></div><div id="add"></div><div id="list" style="margin-top:8px"></div><div class="glassd card" id="player" style="margin-top:18px"></div>
+    <input type="file" id="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.flac" multiple hidden></div>`);
+  const setBusy=t=>{ const b=$('#busy',v); if(b){ b.hidden=!t; b.textContent=t||''; } };
+  const draw=()=>{
+    $('#chips',v).innerHTML=`<button class="chip ${cat==='fav'?'on':''}" data-c="fav">♥ Favorite</button>`+cats.map(c=>`<button class="chip ${cat===c?'on':''}" data-c="${c}">${LABELS[c]}</button>`).join('');
+    $$('[data-c]',v).forEach(b=>b.onclick=()=>{cat=b.dataset.c;draw();});
+    $('#add',v).innerHTML = cat==='mine' ? `<div class="glass card" style="margin-top:6px"><button class="btn sm" id="addb" style="width:100%">+ ADAUGĂ MELODII DIN TELEFON</button><p class="muted" style="margin:10px 0 0">Alege fișiere audio (MP3, M4A, WAV, OGG). Rămân salvate doar pe acest telefon și nu sunt trimise nicăieri.${Lib.ok?'':' Atenție: browserul nu permite salvarea, deci melodiile rămân doar până închizi pagina.'}</p><p id="busy" class="muted" style="margin:8px 0 0;color:var(--gold)" hidden></p></div>` : '';
+    const ab=$('#addb',v); if(ab) ab.onclick=()=>$('#file',v).click();
+    const list=cat==='fav'?allTracks().filter(t=>P.favT.includes(t.id)):allTracks().filter(t=>t.category===cat);
+    $('#list',v).innerHTML=list.length?list.map(t=>{const on=Pl.now&&Pl.now.trackId===t.id,f=P.favT.includes(t.id),u=t.kind==='user';
+      return `<div class="track row ${on?'glass on':'glassd'}"><button class="ib" data-p="${t.id}" aria-label="${on&&Pl.playing?'Pauză':'Redă'} ${esc(t.title)}">${on&&Pl.playing?I.pause:I.play}</button><div class="n"><b style="font-size:15px;overflow-wrap:anywhere">${esc(t.title)}</b><div class="muted">${LABELS[t.category]}${u?' · '+fmt(t.duration):''}</div></div><button class="ib ${f?'act':''}" data-f="${t.id}" aria-label="Favorit">${I.heart(f)}</button>${u?`<button class="ib ${armed===t.id?'act':''}" data-d="${t.id}" aria-label="Șterge melodia" style="${armed===t.id?'width:auto;border-radius:99px;padding:0 12px;font-size:12px':''}">${armed===t.id?'Șterge?':I.x}</button>`:''}</div>`}).join('')
+      : `<div class="glass card muted">${cat==='mine'?'Nu ai melodii încă. Apasă butonul de mai sus și alege fișiere din telefon.':'Nu ai piese favorite încă.'}</div>`;
+    $$('[data-p]',v).forEach(b=>b.onclick=()=>{ Pl.now&&Pl.now.trackId===b.dataset.p ? toggle() : playTrack(b.dataset.p); });
+    $$('[data-f]',v).forEach(b=>b.onclick=()=>{const id=b.dataset.f;P.favT=P.favT.includes(id)?P.favT.filter(x=>x!==id):[...P.favT,id];savePrefs();draw();});
+    $$('[data-d]',v).forEach(b=>b.onclick=async()=>{ const id=b.dataset.d;
+      if(armed===id){ armed=null; if(Pl.now&&Pl.now.trackId===id) stopAll(); await Lib.remove(id); toast('Melodie ștearsă'); draw(); }
+      else { armed=id; draw(); setTimeout(()=>{ if(armed===id){armed=null; if(state.refresh===draw) draw();} },3000); } });
+    drawPlayer();
+  };
+  const drawPlayer=()=>{
+    const p=$('#player',v);
+    if(!Pl.now){ p.innerHTML='<p class="center muted" style="margin:0;font-size:14px">Alege o piesă pentru a porni playerul.</p>'; return; }
+    const fav=Pl.now.trackId&&P.favT.includes(Pl.now.trackId), seek=Pl.now.kind==='user';
+    p.innerHTML=`<div class="center"><div class="disp" style="font-size:25px;overflow-wrap:anywhere">${esc(Pl.now.title)}</div>${Pl.now.category?`<div class="muted">${LABELS[Pl.now.category]}</div>`:''}</div>
+      <div style="margin-top:10px"><div id="seek" style="padding:8px 0;${seek?'cursor:pointer':''}"><div class="bar" role="progressbar" aria-label="Progres"><i id="pbar"></i></div></div><div class="row muted" style="justify-content:space-between"><span id="pel">${fmt(Pl.elapsed)}</span><span>${fmt(Pl.now.duration)}</span></div></div>
+      <div class="row" style="justify-content:center;gap:6px;margin-top:6px">
+        <button class="ib ${Pl.repeat?'act':''}" id="rep" aria-label="Repetă">${I.rep}</button><button class="ib" id="prv" aria-label="Anterioara" ${Pl.now.trackId?'':'disabled'}>${I.prev}</button>
+        <button id="big" aria-label="Redă / pauză" style="width:64px;height:64px;border-radius:50%;background:rgba(248,243,234,.92);color:var(--ink);display:grid;place-items:center" class="ico">${Pl.playing?I.pause:I.play}</button>
+        <button class="ib" id="nxt" aria-label="Următoarea" ${Pl.now.trackId?'':'disabled'}>${I.next}</button><button class="ib ${fav?'act':''}" id="fv" aria-label="Favorit" ${Pl.now.trackId?'':'disabled'}>${I.heart(fav)}</button></div>
+      ${sliderHTML('mv','Volum muzică',P.music,0,1,.01,pct)}
+      <div style="margin-top:8px"><div class="row" style="gap:8px;font-weight:600;font-size:14px"><span class="ico">${I.timer}</span>Oprire automată<span id="tleft" class="muted" style="margin-left:auto;font-weight:400"></span></div>
+      <div class="row" style="gap:8px;margin-top:8px"><button class="chip ${Pl.timerLeft==null?'on':''}" data-t="off">Oprit</button>${[15,30,60].map(m=>`<button class="chip" data-t="${m}">${m} min</button>`).join('')}</div></div>
+      ${Pl.err?`<p class="muted" style="color:var(--gold)">${esc(Pl.err)}</p>`:''}`;
+    $('#big',p).querySelector('svg').style.cssText='width:26px;height:26px';
+    $('#big',p).onclick=toggle; $('#rep',p).onclick=()=>{Pl.repeat=!Pl.repeat;drawPlayer();}; $('#prv',p).onclick=()=>step(-1); $('#nxt',p).onclick=()=>step(1);
+    if(seek) $('#seek',p).onclick=e=>{ const r=e.currentTarget.getBoundingClientRect(); const off=Math.max(0,Math.min(.98,(e.clientX-r.left)/r.width))*Pl.now.duration; const t=trackById(Pl.now.trackId); if(t) playUser(t,off); };
+    $('#fv',p).onclick=()=>{const id=Pl.now.trackId;P.favT=P.favT.includes(id)?P.favT.filter(x=>x!==id):[...P.favT,id];savePrefs();draw();};
+    $('#mv',p).oninput=e=>{P.music=+e.target.value;Eng.setVol(P.music);$('#mv-v',p).textContent=pct(P.music);savePrefs();};
+    $$('[data-t]',p).forEach(b=>b.onclick=()=>{setTimer(b.dataset.t==='off'?null:+b.dataset.t);drawPlayer();});
+    refreshPlayerUI(true);
+  };
+  $('#file',v).onchange=async e=>{
+    const files=[...e.target.files]; e.target.value=''; let ok=0;
+    for(const f of files){ setBusy('Se adaugă „'+f.name+'”…'); try{ await Lib.add(f); ok++; }catch(err){ toast(err.message||('Nu am putut adăuga „'+f.name+'”.')); } }
+    setBusy(''); if(ok) toast(ok===1?'Melodie adăugată':ok+' melodii adăugate'); cat='mine'; draw();
+  };
+  state.refresh=draw; draw(); return v;
+}
+
+function vBreathe(auto){
+  let run=false, left=P.session*60;
+  const v = h(`<div class="center" style="padding-top:22px"><h2 class="soft" style="font-size:38px">Respirație ghidată</h2>
+    <div style="height:290px;display:grid;place-items:center;position:relative;margin-top:14px"><div class="sphere" id="sph" aria-hidden="true"></div><div class="disp" id="ph" aria-live="polite" style="position:absolute;font-size:30px;color:var(--ink)"></div></div>
+    <div class="muted" id="cd" style="font-size:14px;min-height:22px"></div><p id="done" style="max-width:300px;margin:6px auto 0" hidden>Sesiune încheiată. Rămâi încă un moment aici, dacă vrei.</p>
+    <div id="ctl" style="margin-top:18px"></div>
+    <p class="muted" style="max-width:300px;margin:22px auto 0">Nu există reținere a respirației. Dacă simți amețeală, revino la respirația ta obișnuită.</p></div>`);
+  const sph=$('#sph',v), ph=$('#ph',v);
+  const ctl=()=>{ const c=$('#ctl',v);
+    if(run){ c.innerHTML='<button class="glass" id="stp" style="border-radius:99px;padding:12px 32px;font-weight:600;letter-spacing:.15em;font-size:13px">OPREȘTE ACUM</button>'; $('#stp',c).onclick=stop; }
+    else { c.innerHTML=`<div class="row" style="justify-content:center;gap:8px">${[2,5,10].map(m=>`<button class="chip ${P.session===m?'on':''}" data-s="${m}">${m} min</button>`).join('')}</div>
+      <div class="glass card" style="margin:14px auto 0;max-width:340px;padding:8px 16px">${sliderHTML('pc','Ritm',P.pace,3,7,.5,x=>x+' s')}</div><button class="btn" id="go" style="margin-top:20px">ÎNCEPE</button>`;
+      $$('[data-s]',c).forEach(b=>b.onclick=()=>{P.session=+b.dataset.s;left=P.session*60;savePrefs();ctl();});
+      $('#pc',c).oninput=e=>{P.pace=+e.target.value;$('#pc-v',c).textContent=P.pace+' s';savePrefs();}; $('#go',c).onclick=start; } };
+  function stop(){ clearBreath(); run=false; left=P.session*60; sph.style.transform='scale(.85)'; sph.style.opacity='.85'; ph.textContent=''; $('#cd',v).textContent=''; ctl(); }
+  function start(){ clearBreath(); run=true; left=P.session*60; $('#done',v).hidden=true; ctl();
+    const phase=inh=>{ if(!run)return; ph.textContent=inh?'Inspiră ușor.':'Expiră lent.'; sph.style.transition=`transform ${P.still?.6:P.pace}s ease-in-out`; sph.style.transform=inh?'scale(1.25)':'scale(.62)'; sph.style.opacity='1'; breathTimers.push(setTimeout(()=>phase(!inh),P.pace*1000)); };
+    phase(true); $('#cd',v).textContent=fmt(left);
+    breathTimers.push(setInterval(()=>{ left--; $('#cd',v).textContent=fmt(left); if(left<=0){ stop(); $('#done',v).hidden=false; } },1000)); }
+  ctl(); if(auto) setTimeout(start,50); return v;
+}
+
+function vMessages(){
+  let cat='all'; let feat=D.QUOTES[Math.floor(Date.now()/864e5)%D.QUOTES.length];
+  const cats=Object.keys(D.CATEGORY_NAMES);
+  const v = h(`<div style="padding-top:22px"><h2 class="soft" style="font-size:38px">Mesaje</h2>
+    <div class="glass card center" style="margin-top:16px;padding:24px"><div class="eyebrow">Mesajul zilei</div><p class="disp soft" id="fq" style="font-size:26px;line-height:1.3;margin:10px 0 0;transition:opacity .6s"></p><div class="row" style="justify-content:center;gap:2px;margin-top:14px" id="fa"></div></div>
+    <div class="chips" id="chips" style="margin-top:16px"></div><div id="ql"></div></div>`);
+  const isF=id=>P.favQ.includes(id);
+  const togF=id=>{P.favQ=isF(id)?P.favQ.filter(x=>x!==id):[...P.favQ,id];savePrefs();draw();};
+  const share=async q=>{ const text=q.text+'\n\n— SOUL · Un loc în care sufletul tău poate respira.'; try{ await navigator.clipboard.writeText(text); toast('Mesaj copiat'); }catch(e){ toast('Nu am putut copia. Selectează textul manual.'); } };
+  const listen=async q=>{ const ok=await Voice.say(q.text); if(!ok) toast('Vocea nu este disponibilă pe acest dispozitiv.'); };
+  const acts=(q,id)=>`<button class="ib ${isF(q.id)?'act':''}" data-a="f:${q.id}" aria-label="Favorit">${I.heart(isF(q.id))}</button><button class="ib" data-a="l:${q.id}" aria-label="Ascultă">${I.spk}</button><button class="ib" data-a="s:${q.id}" aria-label="Distribuie">${I.share}</button>`;
+  function draw(){
+    $('#fq',v).textContent=feat.text;
+    $('#fa',v).innerHTML=acts(feat)+'<button class="chip" id="alt" style="margin-left:8px">Alt mesaj</button>';
+    $('#chips',v).innerHTML=['all','fav',...cats].map(c=>`<button class="chip ${cat===c?'on':''}" data-c="${c}">${c==='all'?'Toate':c==='fav'?'♥ Favorite':D.CATEGORY_NAMES[c]}</button>`).join('');
+    const list=cat==='all'?D.QUOTES:cat==='fav'?D.QUOTES.filter(q=>isF(q.id)):D.QUOTES.filter(q=>q.category===cat);
+    $('#ql',v).innerHTML=list.length?list.map(q=>`<div class="quote glassd"><div class="eyebrow" style="color:var(--gold)">${D.CATEGORY_NAMES[q.category]}</div><p>${esc(q.text)}</p><div class="row">${acts(q)}</div></div>`).join(''):'<div class="glass card muted">Încă nu ai mesaje favorite. Atinge inima de la un mesaj pentru a-l păstra.</div>';
+    $$('[data-c]',v).forEach(b=>b.onclick=()=>{cat=b.dataset.c;draw();});
+    $$('[data-a]',v).forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.a.split(':');const q=D.QUOTES.find(x=>x.id===id);k==='f'?togF(id):k==='l'?listen(q):share(q);});
+    $('#alt',v).onclick=()=>{feat=D.QUOTES[Math.floor(Math.random()*D.QUOTES.length)];state.msgScene=Math.floor(Math.random()*1000);if(P.scene==='auto')setScene(MSG_SCENES[state.msgScene%MSG_SCENES.length]);draw();};
+  }
+  draw(); return v;
+}
+
+function vSleep(){
+  const S=[['night','Cer înstelat','✦'],['rain','Sunete de ploaie','☂'],['waves','Valuri','≈'],['forest','Pădure nocturnă','❦'],['ambient','Muzică ambientală','☾']];
+  let active=null, minutes=30;
+  const v=h(`<div style="padding-top:8px"><div class="row"><button class="ib" id="bk" aria-label="Înapoi">${I.back}</button></div>
+    <div class="center" style="margin-top:10px"><h2 class="soft" style="font-size:38px">Sleep Sanctuary</h2><p class="muted" style="margin:8px 0 0;font-size:14px">Închide ochii. Lasă sunetul să te poarte.</p></div>
+    <div id="sl" style="margin-top:26px"></div><div class="glassd card" style="margin-top:14px" id="st"></div></div>`);
+  const draw=()=>{
+    $('#sl',v).innerHTML=S.map(([k,t,e])=>{const on=active===k&&Pl.playing;return `<button class="mood row ${on?'':'glassd'}" data-k="${k}" aria-pressed="${on}" style="gap:16px;${on?'background:rgba(200,182,226,.3);box-shadow:0 0 0 1px rgba(200,182,226,.6)':''}"><span style="font-size:22px;color:var(--gold)">${e}</span><span style="flex:1;font-size:15px">${t}</span><span class="ico">${on?I.pause:I.play}</span></button>`}).join('');
+    $$('[data-k]',v).forEach(b=>b.onclick=async()=>{ const k=b.dataset.k; if(active===k&&Pl.playing){await toggle();} else { active=k; await playKind(k,S.find(s=>s[0]===k)[1]); setTimer(minutes);} draw(); });
+    $('#st',v).innerHTML=`<div class="row" style="gap:8px;font-weight:600;font-size:14px"><span class="ico">${I.timer}</span>Temporizator<span id="tleft" class="muted" style="margin-left:auto;font-weight:400"></span></div>
+      <div class="row" style="gap:8px;margin-top:10px">${[15,30,60].map(m=>`<button class="chip ${minutes===m?'on':''}" data-m="${m}">${m} min</button>`).join('')}</div>
+      <p class="muted" style="margin:10px 0 0">Volumul scade treptat în ultimul minut.</p>${sliderHTML('sv','Volum muzică',P.music,0,1,.01,pct)}`;
+    $$('[data-m]',v).forEach(b=>b.onclick=()=>{minutes=+b.dataset.m;if(Pl.playing)setTimer(minutes);draw();});
+    $('#sv',v).oninput=e=>{P.music=+e.target.value;Eng.setVol(P.music);$('#sv-v',v).textContent=pct(P.music);savePrefs();};
+    refreshPlayerUI(true);
+  };
+  $('#bk',v).onclick=()=>{state.overlay=null;render();}; state.refresh=draw; draw(); return v;
+}
+
+function moodMusicCard(){
+  if(!Lib.items.length) return `<div class="glass card" style="margin-top:14px"><b style="font-size:14px">Melodii pentru experiențe</b><p class="muted" style="margin:6px 0 0">Adaugă melodii în Muzică → Melodiile mele. Apoi le poți alege aici pentru fiecare stare.</p></div>`;
+  return `<div class="glass card" style="margin-top:14px"><b style="font-size:14px">Melodii pentru experiențe</b>${MOODS.map(([m,l])=>`<label class="muted" style="display:block;margin-top:10px;font-size:13px">${l}<select data-mt="${m}"><option value="">Sunet generat (implicit)</option>${Lib.items.map(t=>`<option value="${t.id}" ${P.moodTrack[m]===t.id?'selected':''}>${esc(t.title)}</option>`).join('')}</select></label>`).join('')}</div>`;
+}
+function vProfile(){
+  const v=h(`<div style="padding-top:22px"><h2 class="soft" style="font-size:38px">Profil</h2>
+    <div class="glass card" style="margin-top:16px">
+      <div class="trow"><div><div style="font-weight:600">Voce de încurajare: <span id="vs">${P.voice?'ON':'OFF'}</span></div><div class="muted" id="vh" style="margin-top:2px"></div></div><button class="sw" id="vsw" role="switch" aria-checked="${P.voice}" aria-label="Voce de încurajare"></button></div>
+      ${sliderHTML('mv','Volum muzică',P.music,0,1,.01,pct)}${sliderHTML('vv','Volum voce',P.voiceVol,0,1,.01,pct)}
+      <button class="row muted" id="tv" style="gap:8px;margin-top:4px;color:rgba(248,243,234,.85);font-size:14px"><span class="ico">${I.spk}</span>Testează vocea</button></div>
+    <div class="glass card" style="margin-top:14px">
+      <label style="font-weight:600;font-size:14px;display:block">Fundal preferat<select id="sc"><option value="auto">Automat (după stare)</option>${D.SCENES.map(s=>`<option value="${s.id}" ${P.scene===s.id?'selected':''}>${s.name}</option>`).join('')}</select></label>
+      <label style="font-weight:600;font-size:14px;display:block;margin-top:14px">Limba aplicației<select id="lg"><option>Română</option><option disabled>English (în aplicația reală)</option><option disabled>Italiano (în aplicația reală)</option></select></label>
+      <div class="trow" style="margin-top:8px"><div><div style="font-weight:600">Redu animațiile</div><div class="muted">Folosește imagini statice în locul animațiilor</div></div><button class="sw" id="mo" role="switch" aria-checked="${P.still}" aria-label="Redu animațiile"></button></div></div>
+    ${moodMusicCard()}<button class="glass row" id="hp" style="width:100%;border-radius:24px;padding:20px;margin-top:14px;gap:12px;text-align:left"><span class="ico">${I.help}</span><b style="flex:1">Ajutor și siguranță</b></button>
+    <p class="muted center" style="margin-top:20px">Datele tale rămân pe acest dispozitiv. Aceasta este o demonstrație; aplicația completă are și notificări și instalare PWA.</p></div>`);
+  $('#vh',v).textContent=Voice.status();
+  if('speechSynthesis'in window) speechSynthesis.onvoiceschanged=()=>{const e=$('#vh');if(e)e.textContent=Voice.status();};
+  const sw=(id,fn)=>{const b=$(id,v);b.onclick=()=>{const on=b.getAttribute('aria-checked')!=='true';b.setAttribute('aria-checked',on);fn(on);savePrefs();};};
+  sw('#vsw',on=>{P.voice=on;$('#vs',v).textContent=on?'ON':'OFF';});
+  sw('#mo',on=>{P.still=on;$('#app').classList.toggle('still',on);});
+  $('#mv',v).oninput=e=>{P.music=+e.target.value;Eng.setVol(P.music);$('#mv-v',v).textContent=pct(P.music);savePrefs();};
+  $('#vv',v).oninput=e=>{P.voiceVol=+e.target.value;$('#vv-v',v).textContent=pct(P.voiceVol);savePrefs();};
+  $('#tv',v).onclick=async()=>{const ok=await Voice.say('Bine ai venit. Respiră încet. Ești în siguranță aici.');if(!ok)toast('Vocea nu este disponibilă pe acest dispozitiv.');};
+  $('#sc',v).onchange=e=>{P.scene=e.target.value;savePrefs();curScene='';render();};
+  $$('[data-mt]',v).forEach(sel=>sel.onchange=()=>{ if(sel.value) P.moodTrack[sel.dataset.mt]=sel.value; else delete P.moodTrack[sel.dataset.mt]; savePrefs(); });
+  $('#hp',v).onclick=()=>{state.overlay={type:'help'};render();};
+  return v;
+}
+
+function vHelp(){
+  const v=h(`<div style="padding-top:8px"><button class="ib" id="bk" aria-label="Înapoi">${I.back}</button><h2 class="soft" style="font-size:38px;margin-top:4px">Ajutor și siguranță</h2>
+    <div class="glass card" style="margin-top:16px;border-color:rgba(232,201,139,.6)"><b>Dacă ești în pericol imediat</b><p style="margin:8px 0 0;line-height:1.6">Dacă te gândești să îți faci rău sau ești în pericol, sună <b>acum</b> la numărul de urgență <b style="background:var(--gold);color:var(--ink);padding:1px 8px;border-radius:6px">112</b> sau cere ajutorul unei persoane de încredere din apropiere. Nu rămâne singur cu asta.</p></div>
+    <div class="glass card" style="margin-top:14px"><b>Ce este și ce nu este SOUL</b><ul style="margin:8px 0 0;padding-left:20px;line-height:1.6"><li>Oferă momente de liniște și sprijin emoțional general: muzică, imagini, respirație și mesaje.</li><li>Nu este un instrument medical, nu pune diagnostice, nu oferă tratament și nu înlocuiește un specialist.</li><li>Nu promite vindecarea anxietății, a depresiei sau a altor suferințe.</li></ul></div>
+    <div class="glass card" style="margin-top:14px"><b>Când să ceri ajutor de specialitate</b><p style="margin:8px 0 0;line-height:1.6">Merită să vorbești cu un medic de familie, psiholog sau psihoterapeut dacă tristețea, anxietatea sau epuizarea durează de mai multe săptămâni, îți afectează somnul, munca ori relațiile sau simți că nu mai faci față. Cererea de ajutor este un pas de grijă față de tine, nu un eșec.</p></div></div>`);
+  $('#bk',v).onclick=()=>{state.overlay=null;render();}; return v;
+}
+
+render();
+Lib.load().then(()=>{ if(state.refresh) state.refresh(); });
+try{ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }catch(e){}
+</script>
+</body></html>

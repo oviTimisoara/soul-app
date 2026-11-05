@@ -1,5 +1,5 @@
 {
-  "name": "SOUL — Your Peaceful Place",
+  "name": "Soul — Muzică pentru echilibrul tău interior",
   "short_name": "SOUL",
   "description": "Un loc în care sufletul tău poate respira.",
   "lang": "ro",
@@ -8,8 +8,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0e1424",
-  "theme_color": "#0e1424",
+  "background_color": "#211c36",
+  "theme_color": "#211c36",
   "icons": [
     {
       "src": "icons/icon-192.png?v=8",

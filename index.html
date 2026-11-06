@@ -168,11 +168,11 @@ const Eng = {
     const nd = this.nb.getChannelData(0); for(let i=0;i<nl;i++)nd[i]=Math.random()*2-1;
     return c;
   },
-  setVol(v){ if(this.ctx) this.music.gain.setTargetAtTime(v,this.ctx.currentTime,.08); },
+  setVol(v){ if(this.ctx) this.music.gain.setTargetAtTime(v,this.ctx.currentTime,.08); if(this.el) this.el.volume=v; },
   duck(){ if(!this.ctx)return; this.duckG.gain.cancelScheduledValues(this.ctx.currentTime); this.duckG.gain.setTargetAtTime(.22,this.ctx.currentTime,.3); },
   unduck(){ if(!this.ctx)return; this.duckG.gain.cancelScheduledValues(this.ctx.currentTime); this.duckG.gain.setTargetAtTime(1,this.ctx.currentTime,1.2); },
-  fadeOut(sec){ if(!this.ctx)return; const t=this.ctx.currentTime; this.sleep.gain.cancelScheduledValues(t); this.sleep.gain.setValueAtTime(this.sleep.gain.value,t); this.sleep.gain.linearRampToValueAtTime(.0001,t+sec); },
-  resetFade(){ if(!this.ctx)return; this.sleep.gain.cancelScheduledValues(this.ctx.currentTime); this.sleep.gain.setValueAtTime(1,this.ctx.currentTime); },
+  fadeOut(sec){ if(this.el){ const el=this.el,start=el.volume,steps=Math.max(1,Math.ceil(sec*10)); let i=0; clearInterval(this.nativeFade); this.nativeFade=setInterval(()=>{ if(this.el!==el){clearInterval(this.nativeFade);return;} el.volume=Math.max(0,start*(1-(++i/steps))); if(i>=steps){clearInterval(this.nativeFade);this.nativeFade=null;} },100); return; } if(!this.ctx)return; const t=this.ctx.currentTime; this.sleep.gain.cancelScheduledValues(t); this.sleep.gain.setValueAtTime(this.sleep.gain.value,t); this.sleep.gain.linearRampToValueAtTime(.0001,t+sec); },
+  resetFade(){ clearInterval(this.nativeFade); this.nativeFade=null; if(this.el)this.el.volume=P.music; if(!this.ctx)return; this.sleep.gain.cancelScheduledValues(this.ctx.currentTime); this.sleep.gain.setValueAtTime(1,this.ctx.currentTime); },
   async play(kind,seed){
     const c = this.ensure(); if (c.state==='suspended') await c.resume();
     this.killSources(.6); this.resetFade(); this.playing = true;
@@ -180,21 +180,23 @@ const Eng = {
     out.gain.setTargetAtTime(1,c.currentTime,.6);
     this.gen(kind, seed, out);
   },
-  el:null,
-  pause(){ if(this.ctx&&this.playing){ this.playing=false; if(this.el)this.el.pause(); this.ctx.suspend(); } },
-  async resume(){ if(this.ctx){ await this.ctx.resume(); if(this.el) await this.el.play().catch(()=>{}); this.playing=true; } },
+  el:null, nativeFade:null,
+  pause(){ if(this.playing){ this.playing=false; if(this.el)this.el.pause(); if(this.ctx&&this.ctx.state==='running') this.ctx.suspend(); } },
+  async resume(){ if(this.ctx&&this.ctx.state==='suspended') await this.ctx.resume(); if(this.el) await this.el.play(); this.playing=true; },
   decode(ab){ const c=this.ensure(); return new Promise((res,rej)=>{ try{ const r=c.decodeAudioData(ab.slice(0),res,rej); if(r&&r.then)r.then(res,rej); }catch(e){rej(e)} }); },
   newOut(){ const c=this.ctx; this.killSources(.5); this.resetFade(); this.playing=true; const out=c.createGain(); out.gain.value=0; out.connect(this.duckG); this.soundGain=out; out.gain.setTargetAtTime(1,c.currentTime,.4); return out; },
-  async playMedia(blob,offset){
-    const c=this.ensure(); if(c.state==='suspended') await c.resume();
-    const url=URL.createObjectURL(blob); const el=new Audio(); el.loop=true; el.preload='auto'; el.src=url;
+  async playOriginalMedia(blob,offset){
+    this.stop(); this.resetFade();
+    const url=URL.createObjectURL(blob),el=new Audio();
+    el.preload='auto'; el.volume=P.music; el.src=url; this.el=el; this.playing=true;
+    const cleanup=()=>{ clearInterval(this.nativeFade); this.nativeFade=null; el.pause(); el.removeAttribute('src'); el.load(); URL.revokeObjectURL(url); };
+    this.stoppers.push(cleanup);
     try{
-      await new Promise((res,rej)=>{ el.onloadedmetadata=res; el.onerror=()=>rej(new Error('media')); setTimeout(()=>rej(new Error('timeout')),8000); });
-      if(offset) el.currentTime=offset;
-      const out=this.newOut(); const node=c.createMediaElementSource(el); node.connect(out);
-      this.stoppers.push(()=>{ el.pause(); try{node.disconnect()}catch(e){} URL.revokeObjectURL(url); });
-      await el.play(); this.el=el; return el.duration;
-    }catch(e){ URL.revokeObjectURL(url); throw e; }
+      await new Promise((res,rej)=>{ el.onloadedmetadata=res; el.onerror=()=>rej(new Error('media')); setTimeout(()=>rej(new Error('timeout')),12000); });
+      if(this.el!==el) throw new Error('stopped');
+      if(offset) el.currentTime=Math.min(offset,Math.max(0,el.duration-.05));
+      await el.play(); return el.duration;
+    }catch(e){ if(this.el===el)this.stop(); throw e; }
   },
   async playBuffer(buf,offset){
     const c=this.ensure(); if(c.state==='suspended') await c.resume();
@@ -372,15 +374,10 @@ async function playUser(t,offset=0){
     Pl.fading=false;
     const rec=await Lib.get(t.id); if(!rec) throw new Error('lipsă');
     const blob=new Blob([rec.data],{type:rec.type});
-    let dur;
-    try{ dur=await Eng.playMedia(blob,offset); }
-    catch(e1){
-      const buf=(Lib.cache&&Lib.cache.id===t.id)?Lib.cache.buf:await Eng.decode(rec.data);
-      Lib.cache={id:t.id,buf}; await Eng.playBuffer(buf,offset); dur=buf.duration;
-    }
+    const dur=await Eng.playOriginalMedia(blob,offset);
     Pl.now={title:t.title,kind:'user',seed:0,trackId:t.id,category:'mine',duration:Math.max(1,Math.round(isFinite(dur)&&dur?dur:t.duration))};
     Pl.elapsed=offset; Pl.playing=true; Pl.err=null;
-  }catch(e){ Pl.err='Nu am putut reda „'+t.title+'”. Încearcă alt fișier (MP3, M4A, WAV, OGG).'; Pl.playing=false; }
+  }catch(e){ Pl.err='Nu am putut reda „'+t.title+'”. Încearcă să redai fișierul în formatul original MP3, M4A, WAV sau OGG.'; Pl.playing=false; }
   runTicker(); refreshPlayerUI();
 }
 const MOODS=D.EXPERIENCES.map(e=>[e.mood,e.title]);

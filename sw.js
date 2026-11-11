@@ -1,6 +1,6 @@
 // SOUL service worker: makes the app open offline. Bump VERSION after changing index.html.
-const VERSION = 'soul-demo-v13';
-const SHELL = ['./', 'index.html', 'zen.css', 'reference.js', 'soundtrack.js', 'demo-music.js', 'assets/welcome-mountains.webp', 'assets/emotion-atlas.webp', 'assets/zen-stones.webp', 'assets/player-lake.webp', 'assets/zen-nature.webp', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+const VERSION = 'soul-v14';
+const SHELL = ['./', 'index.html', 'zen.css', 'reference.js', 'soundtrack.js', 'assets/welcome-mountains.webp', 'assets/emotion-atlas.webp', 'assets/zen-stones.webp', 'assets/player-lake.webp', 'assets/zen-nature.webp', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {

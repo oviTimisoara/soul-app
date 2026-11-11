@@ -186,12 +186,12 @@ const Eng = {
   newOut(){ const c=this.ctx; this.killSources(.5); this.resetFade(); this.playing=true; const out=c.createGain(); out.gain.value=0; out.connect(this.duckG); this.soundGain=out; out.gain.setTargetAtTime(1,c.currentTime,.4); return out; },
   async playOriginalMedia(blob,offset){
     this.stop(); this.resetFade();
-    const url=URL.createObjectURL(blob),el=new Audio();
+    const own=typeof blob!=='string', url=own?URL.createObjectURL(blob):blob, el=new Audio();
     el.preload='auto'; el.volume=P.music; el.src=url; this.el=el; this.playing=true;
-    const cleanup=()=>{ clearInterval(this.nativeFade); this.nativeFade=null; el.pause(); el.removeAttribute('src'); el.load(); URL.revokeObjectURL(url); };
+    const cleanup=()=>{ clearInterval(this.nativeFade); this.nativeFade=null; el.onended=el.onerror=null; el.pause(); el.removeAttribute('src'); el.load(); if(own)URL.revokeObjectURL(url); if(this.el===el)this.el=null; };
     this.stoppers.push(cleanup);
     try{
-      await new Promise((res,rej)=>{ el.onloadedmetadata=res; el.onerror=()=>rej(new Error('media')); setTimeout(()=>rej(new Error('timeout')),12000); });
+      await new Promise((res,rej)=>{ el.onloadedmetadata=res; el.onerror=()=>rej(new Error('media')); setTimeout(()=>rej(new Error('timeout')),20000); });
       if(this.el!==el) throw new Error('stopped');
       if(offset) el.currentTime=Math.min(offset,Math.max(0,el.duration-.05));
       await el.play(); return el.duration;
@@ -315,47 +315,21 @@ const allTracks = () => moodCatalog().concat(Lib.items);
 const trackById = id => allTracks().find(t=>t.id===id);
 const playTrack = id => { const t=trackById(id); if(!t) return; if(t.kind==='recording') return playRecording(t); if(t.kind==='user') return playUser(t,0); return startSound({title:t.title,kind:t.kind,seed:t.seed,trackId:t.id,category:t.category,duration:t.duration}); };
 async function playRecording(track) {
-  const el = new Audio();
-  Eng.stop();
   Pl.now = {...track, trackId:track.id};
-  Pl.elapsed = 0;
-  Pl.playing = false;
-  Pl.fading = false;
-  Pl.err = null;
+  Pl.elapsed = 0; Pl.playing = false; Pl.fading = false; Pl.err = null;
   try {
-    const context = Eng.ensure();
-    const output = Eng.newOut();
-    const node = context.createMediaElementSource(el);
-    node.connect(output);
-    Eng.el = el;
-    Eng.stoppers.push(() => {
-      el.onended = el.onerror = null;
-      el.pause();
-      node.disconnect();
-      el.removeAttribute('src');
-      el.load();
-    });
-    el.onended = () => Pl.repeat ? playRecording(track) : step(1);
-    el.onerror = () => {
-      if (Eng.el !== el) return;
-      Pl.playing = false;
-      Pl.err = 'Piesa nu a putut fi încărcată. Apasă redare pentru a reîncerca.';
-      refreshPlayerUI();
-    };
-    const resumed = context.resume();
+    /* Redare nativă, ca playerul telefonului: fără Web Audio, deci fără sunet subțiat. */
     const blob = archiveInstalled ? await localMusic.read(track.id).catch(() => null) : null;
-    if (Eng.el !== el) return;
-    if (blob) {
-      const url = URL.createObjectURL(blob);
-      Eng.stoppers.push(() => URL.revokeObjectURL(url));
-      el.src = url;
-    } else el.src = track.src;
-    await Promise.all([resumed, el.play()]);
-    if (Eng.el !== el) return;
+    if (Pl.now?.trackId !== track.id) return;
+    const dur = await Eng.playOriginalMedia(blob || track.src, 0);
+    if (Pl.now?.trackId !== track.id) return;
+    const el = Eng.el;
+    el.onended = () => { if (Eng.el === el) Pl.repeat ? playRecording(track) : step(1); };
     Pl.playing = true;
-    if (Number.isFinite(el.duration)) Pl.now.duration = el.duration;
+    if (Number.isFinite(dur)) Pl.now.duration = dur;
   } catch (error) {
-    if (Pl.now?.trackId !== track.id || (Eng.el && Eng.el !== el)) return;
+    if (Pl.now?.trackId !== track.id) return;
+    Pl.playing = false;
     Pl.err = 'Piesa nu a pornit. Apasă redare pentru a reîncerca.';
   }
   runTicker();
